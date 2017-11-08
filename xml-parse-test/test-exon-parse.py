@@ -1,13 +1,36 @@
 import xml.etree.ElementTree as ET
-
-tree = ET.parse("parse-test/LRG_9.xml")
-root = tree.getroot()
-
-for exon in root.iter("exon"):
-    print exon.attrib
+import pprint
 
 
-with open("parse-test/LRG_9.xml", "r") as lrg_9:
-    for line in lrg_9:
-        if "mapping coord_system=\"GRCh37.p13\"" in line:
-            print line.split(" ")
+def parse_exon_positions(lrg_file):
+    """
+    Parse the LRG XML file and get the positions of the exons using LRG
+    coordinate system, returning a dictionary of relative exon positions
+    with the following structure (and start/stop positions on each genome
+    build.
+
+    """
+
+    tree = ET.parse(lrg_file)
+
+    root = tree.getroot()
+    fixed, changeable = root.getchildren()
+
+    lrg_id = fixed.find("id").text
+    position_dict["lrg_id"] = lrg_id
+
+    lrg_exons = [x for x in root.iter("exon") if "label" in x.attrib]
+    position_dict = {}
+
+    for exon in lrg_exons:
+        exon_label = "exon" + exon.attrib["label"]
+        position_dict[exon_label] = {}
+        for coords in exon:
+            if coords.attrib["coord_system"] == lrg_id:
+                position_dict[exon_label]["start"] = coords.attrib["start"]
+                position_dict[exon_label]["end"] = coords.attrib["end"]
+
+
+    return position_dict
+
+pprint.pprint(parse_exon_positions("LRG_9.xml"))
