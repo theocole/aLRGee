@@ -1,6 +1,8 @@
+
 import pandas
 from jinja2 import Environment, FileSystemLoader
 import datetime
+import xml.etree.ElementTree as ET
 
 """
 Command line tool to get LRG file,
@@ -25,10 +27,28 @@ def get_exon_shifts(cl_args):
         """
         pass
 
+        #!/usr/bin/python
+        # import sys
+        # def take_gene_name ():
+            #arg1[gene_name]
+            #arg2[exon_of_interest]
+            #arg3[exon_before]
+            #arg4[exon_after]
+
+            #if gene_name in URL:
+                #return XML
+            #else:
+            #print"Error gene name not found"
+        ####
+
+
     def xml_parser(lrg_file):
         """
         Take XML file and return dict of relative exon positions and start and
         stop positions for both genome builds.
+
+        lrg_file must be a path to the XML file being used in this run of the
+        program.
 
         Usage
         -----
@@ -71,7 +91,21 @@ def get_exon_shifts(cl_args):
             }
 
         """
-        pass
+
+        position_dict = {}
+
+        tree = ET.parse(lrg_file)
+
+        lrg_root = tree.getroot()
+        fixed, updatable = lrg_root.getchildren()
+
+        lrg_id = fixed.find("id").text
+        position_dict["lrg_id"] = lrg_id
+
+        lrg_exons = [x for x in root.iter("exon") if "label" in x.attrib]
+
+
+
 
     def plot_exon_shifts():
         """

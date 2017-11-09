@@ -11,19 +11,58 @@ def parse_exon_positions(lrg_file):
     with the following structure (and start/stop positions on each genome
     build.
 
+    Usage
+    -----
+    xml_parser("LRG_9.xml")
+    ==> {gene_id: "SDHD",
+         lrg_id: "LRG_9",
+         rel_exons: {
+             exon1: {
+                 start: 123,
+                 stop: 543,
+             }
+             exon2: {
+                 start: 876,
+                 stop: 934
+             }
+             ...
+         }
+         build_37: {
+            start: 1545693486,
+            stop: 1634534988,
+            exons: {
+                exon1: {
+                    start: 157567567 + rel_exons[exon1]
+                    stop: ...
+                }
+                ...
+            }
+         }
+         build_38: {
+            start: 1545234654,
+            stop: 1634894564,
+            exons: {
+                exon1: {
+                    start: 157567567 + rel_exons[exon1]
+                    stop: ...
+                }
+                ...
+            }
+        }
+
     """  
 
     position_dict = {}
 
-    tree = ET.parse(lrg_file)
+    lrg_tree = ET.parse(lrg_file)
 
-    root = tree.getroot()
-    fixed, changeable = root.getchildren()
+    lrg_root = lrg_tree.getroot()
+    fixed, changeable = lrg_root.getchildren()
 
     lrg_id = fixed.find("id").text
     position_dict["lrg_id"] = lrg_id
 
-    lrg_exons = [x for x in root.iter("exon") if "label" in x.attrib]
+    lrg_exons = [x for x in lrg_root.iter("exon") if "label" in x.attrib]
     position_dict = {}
 
     for exon in lrg_exons:
