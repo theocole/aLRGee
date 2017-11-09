@@ -1,3 +1,7 @@
+
+import pandas
+from jinja2 import Environment, FileSystemLoader
+import datetime
 import xml.etree.ElementTree as ET
 
 """
@@ -23,8 +27,8 @@ def get_exon_shifts(cl_args):
         """
         pass
 
-        #!/usr/bin/python 
-        # import sys 
+        #!/usr/bin/python
+        # import sys
         # def take_gene_name ():
             #arg1[gene_name]
             #arg2[exon_of_interest]
@@ -32,10 +36,11 @@ def get_exon_shifts(cl_args):
             #arg4[exon_after]
 
             #if gene_name in URL:
-                #return XML 
+                #return XML
             #else:
             #print"Error gene name not found"
         ####
+
 
     def xml_parser(lrg_file):
         """
@@ -82,10 +87,7 @@ def get_exon_shifts(cl_args):
                     }
                     ...
                 }
-<<<<<<< HEAD
-=======
 
->>>>>>> 1347d63255fb8139dcc63c87c065fc065824030b
             }
 
         """
@@ -132,8 +134,32 @@ def get_exon_shifts(cl_args):
         pass
 
     def display_results():
+
+
         """
         Takes df of relative exon positions and absolute genome coords and displays
         on html template.
         """
+        now = datetime.datetime.now()
+
+        current_date = now.strftime("%d-%m-%Y")
+
+        # defining the pandas dataframe
+        test_dict = {"col1": [1,2], "col2": [3,4]}
+        mydataframe = pandas.DataFrame(data=test_dict)
+        mydataframe.head()
+
+        # defining the html template
+        env = Environment(loader=FileSystemLoader('.'))
+        template = env.get_template("xml_report_template.html")
+        # define what to pass to the template
+        template_vars = {"hello": mydataframe.to_html(), "title" : "This is the title"}
+        # pass the template vars to the template
+        html_out = template.render(template_vars)
+        # write to a html file named of the current date
+        file_out = open(current_date+".html", "w")
+        file_out.write(html_out)
+        file_out.write(html_out.replace(" border=\"1\" class=\"dataframe\"", ""))
+        file_out.close()
+
         pass
