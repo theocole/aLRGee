@@ -21,6 +21,7 @@ def get_exon_shifts(cl_args):
         """
         pass
 
+<<<<<<< HEAD
         #!/usr/bin/python 
         # import sys 
         # def take_gene_name ():
@@ -35,9 +36,52 @@ def get_exon_shifts(cl_args):
             #print"Error gene name not found"
         ####
     def xml_parser():
+=======
+    def xml_parser(lrg_file):
+>>>>>>> 2838f2c7832ea97cdb21aabe106aa9699b220401
         """
         Take XML file and return dict of relative exon positions and start and
         stop positions for both genome builds.
+
+        Usage
+        -----
+        xml_parser("LRG_9.xml")
+        ==> {gene_id: "SDHD",
+             lrg_id: "LRG_9",
+             rel_exons: {
+                 exon1: {
+                     start: 123,
+                     stop: 543,
+                 }
+                 exon2: {
+                     start: 876,
+                     stop: 934
+                 }
+                 ...
+             }
+             build_37: {
+                start: 1545693486,
+                stop: 1634534988,
+                exons: {
+                    exon1: {
+                        start: 157567567 + rel_exons[exon1]
+                        stop: ...
+                    }
+                    ...
+                }
+             }
+             build_38: {
+                start: 1545234654,
+                stop: 1634894564,
+                exons: {
+                    exon1: {
+                        start: 157567567 + rel_exons[exon1]
+                        stop: ...
+                    }
+                    ...
+                }
+    
+            }
 
         """
         pass
