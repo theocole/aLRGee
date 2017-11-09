@@ -1,3 +1,7 @@
+import pandas
+from jinja2 import Environment, FileSystemLoader
+import datetime
+
 """
 Command line tool to get LRG file,
 
@@ -21,24 +25,7 @@ def get_exon_shifts(cl_args):
         """
         pass
 
-<<<<<<< HEAD
-        #!/usr/bin/python 
-        # import sys 
-        # def take_gene_name ():
-            #arg1[gene_name]
-            #arg2[exon_of_interest]
-            #arg3[exon_before]
-            #arg4[exon_after]
-
-            #if gene_name in URL:
-                #return XML 
-            #else:
-            #print"Error gene name not found"
-        ####
-    def xml_parser():
-=======
     def xml_parser(lrg_file):
->>>>>>> 2838f2c7832ea97cdb21aabe106aa9699b220401
         """
         Take XML file and return dict of relative exon positions and start and
         stop positions for both genome builds.
@@ -113,8 +100,26 @@ def get_exon_shifts(cl_args):
         pass
 
     def display_results():
+
+
         """
         Takes df of relative exon positions and absolute genome coords and displays
         on html template.
         """
+        now = datetime.datetime.now()
+
+        current_date = now.strftime("%d-%m-%Y")
+
+        test_dict = {"col1": [1,2], "col2": [3,4]}
+        mydataframe = pandas.DataFrame(data=test_dict)
+        mydataframe.head()
+
+        env = Environment(loader=FileSystemLoader('.'))
+        template = env.get_template("xml_report_template.html")
+        template_vars = {"hello": mydataframe.to_html(), "title" : "This is the title"}
+        html_out = template.render(template_vars)
+        file_out = open(current_date+".html", "w")
+        file_out.write(html_out)
+        file_out.close()
+
         pass
