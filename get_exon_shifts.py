@@ -20,6 +20,7 @@ Usage:
 alrgee.py <gene_name> -e <exon_of_interest> [<exons_before>] [<exons_after>]
 """
 
+
 def get_exon_shifts():
     """
     Run through the whole process: take a gene name and output HTML report
@@ -55,7 +56,7 @@ def parse_args():
         '-n', action='store', dest='gene_name', help='HGNC gene name.'
     )
     parser.add_argument(
-        '-e', action='store', dest='exon_of_interest', help='The exon you would like to display a shift calculation for.'
+        '-e', action='store', dest='exon_of_interest', help='Exon you would like to display a shift calculation for.'
     )
     parser.add_argument(
         '-b', action='store', dest='exons_before', help='The number of exons before your exon of interest.'
@@ -65,7 +66,7 @@ def parse_args():
     )
 
     command_args = parser.parse_args()
-    return vars(command_args) 
+    return vars(command_args)
 
 
 def xml_scraper(gene):
