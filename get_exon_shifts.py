@@ -30,10 +30,9 @@ def get_exon_shifts():
     args = parse_args()
     lrg_file_url = xml_scraper(args['gene_name'])
     position_dict = xml_parser(lrg_file_url)
+    results_dict = plot_exon_shifts(position_dict)
 
-    pprint.pprint(position_dict)
-
-    #results_dict = plot_exon_shifts(position_dict)
+    pprint.pprint(results_dict)
 
 
 def parse_args():
@@ -143,85 +142,85 @@ def xml_parser(lrg_file_url):
 
 
 def plot_exon_shifts(position_dict):
-	def calc_genomic_position(exon_num, hg_18_start, hg_18_stop, hg_19_start, hg_19_stop, exon_start, exon_stop):
-		hg18ex_start = (hg_18_start+exon_start)
-		hg18ex_stop = (hg_18_stop+exon_stop)
-		hg19ex_start = (hg_19_start+exon_start)
-		hg19ex_stop = (hg_19_stop+exon_stop)
-		pos_shift = hg19ex_start - hg18ex_start
-		return [exon_num, hg18ex_start, hg18ex_stop, hg19ex_start, hg19ex_stop, pos_shift]
+    def calc_genomic_position(exon_num, hg_18_start, hg_18_stop, hg_19_start, hg_19_stop, exon_start, exon_stop):
+        hg18ex_start = (hg_18_start+exon_start)
+        hg18ex_stop = (hg_18_stop+exon_stop)
+        hg19ex_start = (hg_19_start+exon_start)
+        hg19ex_stop = (hg_19_stop+exon_stop)
+        pos_shift = hg19ex_start - hg18ex_start
+        return [exon_num, hg18ex_start, hg18ex_stop, hg19ex_start, hg19ex_stop, pos_shift]
 
 
-	transcripts = []
-	transcripts_and_exons = []
-	exon_positions = []
-	resultsdict ={}
+    transcripts = []
+    transcripts_and_exons = []
+    exon_positions = []
+    resultsdict ={}
 
-	for key, value in sample_dict.iteritems():
-		if key.startswith("build_GRCh38"):
-			build_38 = value
-		if key.startswith("build_GRCh37"):
-			build_37 = value
-		if key.startswith("lrg_id"):
-			LRG_id = value
-		if key.startswith("t"):
-			transcripts.append([str(key), value])
-
-
-	for key, value in build_38.iteritems():
-		if key.startswith("start"):
-			build_19_start = int(value)
-		if key.startswith("end"):
-			build_19_stop = int(value)
+    for key, value in position_dict.iteritems():
+        if key.startswith("build_GRCh38"):
+            build_38 = value
+        if key.startswith("build_GRCh37"):
+            build_37 = value
+        if key.startswith("lrg_id"):
+            LRG_id = value
+        if key.startswith("t"):
+            transcripts.append([str(key), value])
 
 
-	for key, value in build_37.iteritems():
-		if key.startswith("start"):
-			build_18_start = int(value)
-		if key.startswith("end"):
-			build_18_stop = int(value)
+    for key, value in build_38.iteritems():
+        if key.startswith("start"):
+            build_19_start = int(value)
+        if key.startswith("end"):
+            build_19_stop = int(value)
 
 
-	for entry in transcripts:
-		transcript_number = entry[0]
-		exon_dict = entry[1]
-		for key, value in exon_dict.iteritems():
-			exon_number = key
-			exon_start_stop = value
-			transcripts_and_exons.append([transcript_number, exon_number, value])
+    for key, value in build_37.iteritems():
+        if key.startswith("start"):
+            build_18_start = int(value)
+        if key.startswith("end"):
+            build_18_stop = int(value)
 
 
-	for entry in transcripts_and_exons:
-		transcript = entry[0]
-		exon_positions.append([transcript])
-		exon_start_stop_dict = entry[2]
-		exon_num = entry[1]
-		for entry in exon_positions:
-			if transcript in entry:
-				index = exon_positions.index(entry)
-		for key, value in exon_start_stop_dict.iteritems():
-			if key == "start":
-				start = value
-			if key == "end":
-				stop_coord = value
-
-				exon_positions[index].append([exon_num, start, stop_coord])		
+    for entry in transcripts:
+        transcript_number = entry[0]
+        exon_dict = entry[1]
+        for key, value in exon_dict.iteritems():
+            exon_number = key
+            exon_start_stop = value
+            transcripts_and_exons.append([transcript_number, exon_number, value])
 
 
-	for entry in exon_positions:
-		transcript = entry[0]
-		exons = entry[1:]
-		for detail in exons:
-			exon_num = detail[0]
-			exon_start = int(detail[1])
-			exon_stop = int(detail[2])
-			dataline = calc_genomic_position(exon_num, build_18_start, build_18_stop, build_19_start, build_19_stop, exon_start, exon_stop)
-			if transcript not in resultsdict:
-				resultsdict[transcript] = [dataline]
-			else:
-				resultsdict[transcript].append(dataline)
+    for entry in transcripts_and_exons:
+        transcript = entry[0]
+        exon_positions.append([transcript])
+        exon_start_stop_dict = entry[2]
+        exon_num = entry[1]
+        for entry in exon_positions:
+            if transcript in entry:
+                index = exon_positions.index(entry)
+        for key, value in exon_start_stop_dict.iteritems():
+            if key == "start":
+                start = value
+            if key == "end":
+                stop_coord = value
 
-	return resultsdict
+                exon_positions[index].append([exon_num, start, stop_coord])     
+
+
+    for entry in exon_positions:
+        transcript = entry[0]
+        exons = entry[1:]
+        for detail in exons:
+            exon_num = detail[0]
+            exon_start = int(detail[1])
+            exon_stop = int(detail[2])
+            dataline = calc_genomic_position(exon_num, build_18_start, build_18_stop, build_19_start, build_19_stop, exon_start, exon_stop)
+            if transcript not in resultsdict:
+                resultsdict[transcript] = [dataline]
+            else:
+                resultsdict[transcript].append(dataline)
+
+    return resultsdict
 
 
 def display_results():
