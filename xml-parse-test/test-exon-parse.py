@@ -14,41 +14,59 @@ def parse_exon_positions(lrg_file):
     Usage
     -----
     xml_parser("LRG_9.xml")
-    ==> {gene_id: "SDHD",
-         lrg_id: "LRG_9",
-         rel_exons: {
-             exon1: {
-                 start: 123,
-                 stop: 543,
-             }
-             exon2: {
-                 start: 876,
-                 stop: 934
-             }
-             ...
-         }
-         build_37: {
-            start: 1545693486,
-            stop: 1634534988,
-            exons: {
-                exon1: {
-                    start: 157567567 + rel_exons[exon1]
-                    stop: ...
+     -->
+        sample_dict = {
+        'lrg_id': "LRG_X",
+        'transcript1': {
+            'relative_exon_positions': {
+                'exon1': {
+                    'start': 128,
+                    'stop': 345
                 }
-                ...
-            }
-         }
-         build_38: {
-            start: 1545234654,
-            stop: 1634894564,
-            exons: {
-                exon1: {
-                    start: 157567567 + rel_exons[exon1]
-                    stop: ...
+                'exon2': {
+                    'start': 745,
+                    'stop': 923
                 }
-                ...
+                'exon3': {
+                    'start': 1184,
+                    'stop': 1592
+                }
+                'exon4': {
+                    'start': 1808,
+                    'stop': 2140
+                }
+                'exon5': {
+                    'start': 2781,
+                    'stop': 3019
+                }
             }
         }
+        'transcript2': {
+            'relative_exon_positions': {
+                'exon1': {
+                    'start': 80,
+                    'stop': 194
+                }
+                'exon2': {
+                    'start': 555,
+                    'stop': 801
+                }
+                'exon3': {
+                    'start': 958,
+                    'stop': 1104
+                }
+            }
+        }
+        'build_GRCh37': {
+            'mapping_start': 187429875,
+            'mapping_stop': 187431770,
+        }
+        'build_GRCh38': {
+            'mapping_start': 179354041,
+            'mapping_stop': 179357191,
+        }
+
+    }
 
     """  
 
@@ -57,23 +75,31 @@ def parse_exon_positions(lrg_file):
     lrg_tree = ET.parse(lrg_file)
 
     lrg_root = lrg_tree.getroot()
-    fixed, changeable = lrg_root.getchildren()
+    fixed, updatable = lrg_root.getchildren()
 
     lrg_id = fixed.find("id").text
     position_dict["lrg_id"] = lrg_id
+    print lrg_id
 
-    lrg_exons = [x for x in lrg_root.iter("exon") if "label" in x.attrib]
-    position_dict = {}
+    transcripts = lrg_root.iter("transcript")
+    for transcript in transcripts:
+        if 'name' in transcript.attrib:
+            transcript_name = transcript.attrib['name']
+            print transcript_name
+            transcript_dict = position_dict[transcript_name] = {}
 
-    for exon in lrg_exons:
-        exon_label = "exon" + exon.attrib["label"]
-        position_dict[exon_label] = {}
-        for coords in exon:
-            print coords.attrib["coord_system"]
-            if coords.attrib["coord_system"] == lrg_id:
-                position_dict[exon_label]["start"] = coords.attrib["start"]
-                position_dict[exon_label]["end"] = coords.attrib["end"]
 
+            transcript_exons = [
+                x for x in transcript.findall("exon") if "label" in x.attrib
+            ]
+
+            for exon in transcript_exons:
+                exon_label = "exon" + exon.attrib["label"]
+                exon_position_dict = transcript_dict[exon_label] = {}
+                for coords in exon:
+                    if coords.attrib["coord_system"] == lrg_id:
+                        exon_position_dict["start"] = coords.attrib["start"]
+                        exon_position_dict["end"] = coords.attrib["end"]
 
     return position_dict
 
