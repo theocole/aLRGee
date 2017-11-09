@@ -32,7 +32,7 @@ def get_exon_shifts(cl_args):
     def plot_exon_shifts():
         """
         Take dict of exon positions and absolute genome coords and put into pandas
-        df. 
+        df.
 
         Filter out irrelevant information from the dict, ie only take the exons of
         interest.
@@ -40,6 +40,16 @@ def get_exon_shifts(cl_args):
         Also, set the user's build at this point to determine 'their' exon positions
         and the the shift they would like to know.
         """
+        # take dictionaries from xml_parser
+        # define arguements:
+            # desired_build =
+            # desired_exons =
+        # create build_list (e.g build_list = [18, 19])
+        # create empty data frame:
+
+        """ |exon num | pos_start   |   pos_end  | relative shift |
+            __________| hg18 | hg19 | hg18 | hg19|________________|
+"""
         pass
 
     def display_results():
