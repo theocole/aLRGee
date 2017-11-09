@@ -63,7 +63,7 @@ def get_exon_shifts(cl_args):
                     }
                     ...
                 }
-    
+
             }
 
         """
@@ -80,16 +80,19 @@ def get_exon_shifts(cl_args):
         Also, set the user's build at this point to determine 'their' exon positions
         and the the shift they would like to know.
         """
-        # take dictionaries from xml_parser
+        # take dictionaries from xml_parser and split dictionary into components
         # define arguements:
-            # desired_build =
-            # desired_exons =
-        # create build_list (e.g build_list = [18, 19])
+            # desired_exons = []
         # create empty data frame:
 
         """ |exon num | pos_start   |   pos_end  | relative shift |
             __________| hg18 | hg19 | hg18 | hg19|________________|
+            |         |      |      |      |     |                |
+            |         |      |      |      |     |                |
 """
+
+        # for exon in desired_exons:
+            # add data as a row in the data frame
         pass
 
     def display_results():
