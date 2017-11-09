@@ -11,31 +11,110 @@ def parse_exon_positions(lrg_file):
     with the following structure (and start/stop positions on each genome
     build.
 
-    """  
+    Usage
+    -----
+    xml_parser("LRG_9.xml")
+     -->
+        sample_dict = {
+        'lrg_id': "LRG_X",
+        'transcript1': {
+            'relative_exon_positions': {
+                'exon1': {
+                    'start': 128,
+                    'stop': 345
+                }
+                'exon2': {
+                    'start': 745,
+                    'stop': 923
+                }
+                'exon3': {
+                    'start': 1184,
+                    'stop': 1592
+                }
+                'exon4': {
+                    'start': 1808,
+                    'stop': 2140
+                }
+                'exon5': {
+                    'start': 2781,
+                    'stop': 3019
+                }
+            }
+        }
+        'transcript2': {
+            'relative_exon_positions': {
+                'exon1': {
+                    'start': 80,
+                    'stop': 194
+                }
+                'exon2': {
+                    'start': 555,
+                    'stop': 801
+                }
+                'exon3': {
+                    'start': 958,
+                    'stop': 1104
+                }
+            }
+        }
+        'build_GRCh37': {
+            'mapping_start': 187429875,
+            'mapping_stop': 187431770,
+        }
+        'build_GRCh38': {
+            'mapping_start': 179354041,
+            'mapping_stop': 179357191,
+        }
+
+    }
+
+    """
 
     position_dict = {}
 
-    tree = ET.parse(lrg_file)
+    lrg_tree = ET.parse(lrg_file)
 
-    root = tree.getroot()
-    fixed, changeable = root.getchildren()
+    lrg_root = lrg_tree.getroot()
+    fixed, updatable = lrg_root.getchildren()
 
     lrg_id = fixed.find("id").text
     position_dict["lrg_id"] = lrg_id
 
-    lrg_exons = [x for x in root.iter("exon") if "label" in x.attrib]
-    position_dict = {}
+    transcripts = lrg_root.iter("transcript")
+    for transcript in transcripts:
+        if 'name' in transcript.attrib:
+            transcript_name = transcript.attrib['name']
+            transcript_dict = position_dict[transcript_name] = {}
 
-    for exon in lrg_exons:
-        exon_label = "exon" + exon.attrib["label"]
-        position_dict[exon_label] = {}
-        for coords in exon:
-            print coords.attrib["coord_system"]
-            if coords.attrib["coord_system"] == lrg_id:
-                position_dict[exon_label]["start"] = coords.attrib["start"]
-                position_dict[exon_label]["end"] = coords.attrib["end"]
+            transcript_exons = [
+                x for x in transcript.findall("exon") if "label" in x.attrib
+            ]
 
+            for exon in transcript_exons:
+                exon_label = "exon" + exon.attrib["label"]
+                exon_position_dict = transcript_dict[exon_label] = {}
+                for coords in exon:
+                    if coords.attrib["coord_system"] == lrg_id:
+                        exon_position_dict["start"] = coords.attrib["start"]
+                        exon_position_dict["end"] = coords.attrib["end"]
+
+    mapping_annotation = None
+
+    annotation_sets = updatable.findall("annotation_set")
+    for annotation_set in annotation_sets:
+        if annotation_set.attrib["type"] == "lrg":
+            mapping_annotation = annotation_set
+
+    assert mapping_annotation is not None
+
+    for mapping_coords in mapping_annotation.findall("mapping"):
+        build_name = "build_" + \
+            mapping_coords.attrib["coord_system"].split('.')[0]
+        build_dict = position_dict[build_name] = {}
+        build_dict["start"] = mapping_coords.attrib["other_start"]
+        build_dict["end"] = mapping_coords.attrib["other_end"]
 
     return position_dict
+
 
 pprint.pprint(parse_exon_positions(sys.argv[1]))

@@ -1,3 +1,9 @@
+
+import pandas
+from jinja2 import Environment, FileSystemLoader
+import datetime
+import xml.etree.ElementTree as ET
+
 """
 Command line tool to get LRG file,
 
@@ -21,6 +27,7 @@ def get_exon_shifts(cl_args):
         """
         pass
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 
         '''
@@ -52,17 +59,31 @@ def get_exon_shifts(cl_args):
 
           #if gene_name "www.lrg-sequence.org/LRG":
                 #return XML 
+=======
+        #!/usr/bin/python
+        # import sys
+        # def take_gene_name ():
+            #arg1[gene_name]
+            #arg2[exon_of_interest]
+            #arg3[exon_before]
+            #arg4[exon_after]
+
+            #if gene_name in URL:
+                #return XML
+>>>>>>> b31896e0cab6f13df2beebb4da64c6de75566f6d
             #else:
             #print"Error gene name not found"
         '''
         ####
-    def xml_parser():
-=======
+
+
     def xml_parser(lrg_file):
->>>>>>> 2838f2c7832ea97cdb21aabe106aa9699b220401
         """
         Take XML file and return dict of relative exon positions and start and
         stop positions for both genome builds.
+
+        lrg_file must be a path to the XML file being used in this run of the
+        program.
 
         Usage
         -----
@@ -101,16 +122,30 @@ def get_exon_shifts(cl_args):
                     }
                     ...
                 }
-    
+
             }
 
         """
-        pass
+
+        position_dict = {}
+
+        tree = ET.parse(lrg_file)
+
+        lrg_root = tree.getroot()
+        fixed, updatable = lrg_root.getchildren()
+
+        lrg_id = fixed.find("id").text
+        position_dict["lrg_id"] = lrg_id
+
+        lrg_exons = [x for x in root.iter("exon") if "label" in x.attrib]
+
+
+
 
     def plot_exon_shifts():
         """
         Take dict of exon positions and absolute genome coords and put into pandas
-        df. 
+        df.
 
         Filter out irrelevant information from the dict, ie only take the exons of
         interest.
@@ -118,11 +153,48 @@ def get_exon_shifts(cl_args):
         Also, set the user's build at this point to determine 'their' exon positions
         and the the shift they would like to know.
         """
+        # take dictionaries from xml_parser and split dictionary into components
+        # define arguements:
+            # desired_exons = []
+        # create empty data frame:
+
+        """ |exon num | pos_start   |   pos_end  | relative shift |
+            __________| hg18 | hg19 | hg18 | hg19|________________|
+            |         |      |      |      |     |                |
+            |         |      |      |      |     |                |
+"""
+
+        # for exon in desired_exons:
+            # add data as a row in the data frame
         pass
 
     def display_results():
+
+
         """
         Takes df of relative exon positions and absolute genome coords and displays
         on html template.
         """
+        now = datetime.datetime.now()
+
+        current_date = now.strftime("%d-%m-%Y")
+
+        # defining the pandas dataframe
+        test_dict = {"col1": [1,2], "col2": [3,4]}
+        mydataframe = pandas.DataFrame(data=test_dict)
+        mydataframe.head()
+
+        # defining the html template
+        env = Environment(loader=FileSystemLoader('.'))
+        template = env.get_template("xml_report_template.html")
+        # define what to pass to the template
+        template_vars = {"hello": mydataframe.to_html(), "title" : "This is the title"}
+        # pass the template vars to the template
+        html_out = template.render(template_vars)
+        # write to a html file named of the current date
+        file_out = open(current_date+".html", "w")
+        file_out.write(html_out)
+        file_out.write(html_out.replace(" border=\"1\" class=\"dataframe\"", ""))
+        file_out.close()
+
         pass
