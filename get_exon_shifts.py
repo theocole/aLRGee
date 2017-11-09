@@ -24,6 +24,10 @@ def get_exon_shifts(gene_name):
     Run through the whole process: take a gene name and output HTML report
     of exon position shifts between the two genome builds.
     """
+    lrg_file_url = xml_scraper(gene_name)
+    position_dict = xml_parser(lrg_file_url)
+
+    print(position_dict)
 
 
 def parse_command_line_args():
@@ -42,6 +46,7 @@ def parse_command_line_args():
 
     # results = parser.parse.args()
 
+
 def xml_scraper(gene):
 
     lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
@@ -56,12 +61,10 @@ def xml_scraper(gene):
     gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
     gene_xml_href = gene_xml_link['href']
 
-    lrg_xml_tree = ET.ElementTree(file=urllib2.urlopen(gene_xml_href))
-    root = lrg_xml_tree.getroot()
-    
-    return root
+    return gene_xml_href
 
-def xml_parser(lrg_file):
+
+def xml_parser(lrg_file_url):
     """
     Parse the LRG XML file and get the positions of the exons using LRG
     coordinate system, returning a dictionary of relative exon positions
@@ -72,7 +75,7 @@ def xml_parser(lrg_file):
 
     position_dict = {}
 
-    lrg_tree = ET.parse(lrg_file)
+    lrg_tree = ET.ElementTree(file=urllib2.urlopen(lrg_file_url))
 
     lrg_root = lrg_tree.getroot()
     fixed, updatable = lrg_root.getchildren()
