@@ -19,21 +19,15 @@ Usage:
 
 alrgee.py <gene_name> -e <exon_of_interest> [<exons_before>] [<exons_after>]
 """
-def main():
-    gene_name = -n "gene"
-    exon_number = -e "exon"
-    exon_before = -b "exon_b"
-    exon_after = -a "exon_a"
-    for g in gene_name:
-        
 
-
-def get_exon_shifts(gene_name):
+def get_exon_shifts():
     """
     Run through the whole process: take a gene name and output HTML report
     of exon position shifts between the two genome builds.
     """
-    lrg_file_url = xml_scraper(gene_name)
+
+    args = parse_args()
+    lrg_file_url = xml_scraper(args['gene_name'])
     position_dict = xml_parser(lrg_file_url)
 
     pprint.pprint(position_dict)
@@ -41,8 +35,7 @@ def get_exon_shifts(gene_name):
     #results_dict = plot_exon_shifts(position_dict)
 
 
-def parse_command_line_args():
-    pass
+def parse_args():
 
     # creating flags for arguments
     # parser = argparse.ArgumentParser()
@@ -56,6 +49,23 @@ def parse_command_line_args():
     #                      help='Insert exon no. which comes after exon of interest')
 
     # results = parser.parse.args()
+
+    parser = argparse.ArgumentParser(description="Take gene name and exons of interest.")
+    parser.add_argument(
+        '-n', action='store', dest='gene_name', help='HGNC gene name.'
+    )
+    parser.add_argument(
+        '-e', action='store', dest='exon_of_interest', help='The exon you would like to display a shift calculation for.'
+    )
+    parser.add_argument(
+        '-b', action='store', dest='exons_before', help='The number of exons before your exon of interest.'
+    )
+    parser.add_argument(
+        '-a', action='store', dest='exons_after', help='The number of exons after your exon of interest.'
+    )
+
+    command_args = parser.parse_args()
+    return vars(command_args) 
 
 
 def xml_scraper(gene):
@@ -282,4 +292,4 @@ def display_results():
     pass
 
 
-get_exon_shifts(sys.argv[1])
+get_exon_shifts()
