@@ -23,6 +23,20 @@ def get_exon_shifts(cl_args):
         """
         pass
 
+        #!/usr/bin/python 
+        # import sys 
+        # def take_gene_name ():
+            #arg1[gene_name]
+            #arg2[exon_of_interest]
+            #arg3[exon_before]
+            #arg4[exon_after]
+
+            #if gene_name in URL:
+                #return XML 
+            #else:
+            #print"Error gene name not found"
+        ####
+
     def xml_parser(lrg_file):
         """
         Take XML file and return dict of relative exon positions and start and
@@ -68,6 +82,10 @@ def get_exon_shifts(cl_args):
                     }
                     ...
                 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1347d63255fb8139dcc63c87c065fc065824030b
             }
 
         """
@@ -90,7 +108,7 @@ def get_exon_shifts(cl_args):
     def plot_exon_shifts():
         """
         Take dict of exon positions and absolute genome coords and put into pandas
-        df. 
+        df.
 
         Filter out irrelevant information from the dict, ie only take the exons of
         interest.
@@ -98,6 +116,19 @@ def get_exon_shifts(cl_args):
         Also, set the user's build at this point to determine 'their' exon positions
         and the the shift they would like to know.
         """
+        # take dictionaries from xml_parser and split dictionary into components
+        # define arguements:
+            # desired_exons = []
+        # create empty data frame:
+
+        """ |exon num | pos_start   |   pos_end  | relative shift |
+            __________| hg18 | hg19 | hg18 | hg19|________________|
+            |         |      |      |      |     |                |
+            |         |      |      |      |     |                |
+"""
+
+        # for exon in desired_exons:
+            # add data as a row in the data frame
         pass
 
     def display_results():
