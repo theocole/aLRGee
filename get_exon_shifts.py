@@ -1,10 +1,12 @@
-import sys 
+import sys
 import argparser
 import urllib2
 import pandas
 from jinja2 import Environment, FileSystemLoader
 import datetime
 import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
+import re
 
 """
 Command line tool to get LRG file,
@@ -30,12 +32,12 @@ def get_exon_shifts(cl_args):
         pass
 
         '''
-    #!/usr/bin/python 
-    #import sys 
-    import argparser
-    import urllib2
-        
-    #creating flags for arguments 
+        #!/usr/bin/python 
+        #import sys 
+        import argparser
+        import urllib2
+            
+        #creating flags for arguments 
         parser.add_arguments('-n', action='store', dest='exon_name', help='LRG gene name')
         parser.add_arguments('-e', action='store', dest='exon_number', help='Insert exon number of interest')
         parser.add_arguments('-b', action='store', dest='exon_before', help='Insert exon no. which comes before exon of interest')
@@ -46,44 +48,25 @@ def get_exon_shifts(cl_args):
         print 'exon_number   =', results.exon_number
         print 'exon_before   =', results.exon_before
         print 'exon_after    =', results.exon_after 
-
-    
-    def gene_name(name):
-        page= urllib2.urlopen("www.lrg-sequence.org/LRG").read()
-        print re.findall(name,page)
-        print page.find(name)
-    if 
-
-    def take_gene_name(gene_name, exon_number, exon_before, exon_after):
-
-          #if gene_name "www.lrg-sequence.org/LRG":
-                #return XML 
-
-        #!/usr/bin/python
-        # import sys
-        # def take_gene_name ():
-
-        # arg1[gene_name]
-        # arg2[exon_of_interest]
-        # arg3[exon_before]
-        # arg4[exon_after]
-
-        # if gene_name in URL:
-        # return XML
-        # else:
-        # print"Error gene name not found"
-
-            #arg1[gene_name]
-            #arg2[exon_of_interest]
-            #arg3[exon_before]
-            #arg4[exon_after]
-
-            #if gene_name in URL:
-                #return XML
-            #else:
-            #print"Error gene name not found"
         '''
-        ####
+
+    def xml_scraper(gene):
+        # 1 access www.lrg-sequence.org/LRG
+        lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
+        lrg_list_html = lrg_response.read()
+
+        lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
+
+        gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
+
+        gene_row = gene_cell.find_parent("tr")
+
+        gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
+        gene_xml_href = gene_xml_link['href']
+
+        lrg_xml_tree = ET.ElementTree(file=urllib2.urlopen(gene_xml_href))
+        root = lrg_xml_tree.getroot()
+        print root.tag, root.attrib
 
     def xml_parser(lrg_file):
     """
