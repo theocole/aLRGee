@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 import pprint
 
+import sys
+
 
 def parse_exon_positions(lrg_file):
     """
@@ -9,7 +11,9 @@ def parse_exon_positions(lrg_file):
     with the following structure (and start/stop positions on each genome
     build.
 
-    """
+    """  
+
+    position_dict = {}
 
     tree = ET.parse(lrg_file)
 
@@ -26,6 +30,7 @@ def parse_exon_positions(lrg_file):
         exon_label = "exon" + exon.attrib["label"]
         position_dict[exon_label] = {}
         for coords in exon:
+            print coords.attrib["coord_system"]
             if coords.attrib["coord_system"] == lrg_id:
                 position_dict[exon_label]["start"] = coords.attrib["start"]
                 position_dict[exon_label]["end"] = coords.attrib["end"]
@@ -33,4 +38,4 @@ def parse_exon_positions(lrg_file):
 
     return position_dict
 
-pprint.pprint(parse_exon_positions("LRG_9.xml"))
+pprint.pprint(parse_exon_positions(sys.argv[1]))
