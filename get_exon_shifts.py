@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 import re
 
+import pprint
+
 """
 Command line tool to get LRG file,
 
@@ -27,7 +29,7 @@ def get_exon_shifts(gene_name):
     lrg_file_url = xml_scraper(gene_name)
     position_dict = xml_parser(lrg_file_url)
 
-    print(position_dict)
+    pprint.pprint(position_dict)
 
 
 def parse_command_line_args():
@@ -49,12 +51,22 @@ def parse_command_line_args():
 
 def xml_scraper(gene):
 
-    lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
-    lrg_list_html = lrg_response.read()
+    try:
+        lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
+        lrg_list_html = lrg_response.read()
+    except urllib2.HTTPError:
+        print("WARNING: Could not access LRG database. Aborting...")
+        quit()
 
     lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
 
     gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
+    try:
+        assert gene_cell is not None
+    except AssertionError:
+        print("WARNING: Could not find specified gene. Please ensure this gene definitely has an associated LRG file and that it is spelt correctly.")
+        print("Aborting...")
+        quit()
 
     gene_row = gene_cell.find_parent("tr")
 
