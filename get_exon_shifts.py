@@ -1,5 +1,5 @@
 import sys
-import argparser
+import argparse
 import urllib2
 import pandas
 from jinja2 import Environment, FileSystemLoader
@@ -19,118 +19,54 @@ alrgee.py <gene_name> -b <build_number> -e <exon_of_interest> [<exons_before>] [
 """
 
 
-def get_exon_shifts(cl_args):
+def get_exon_shifts(gene_name):
+    """
+    Run through the whole process: take a gene name and output HTML report
+    of exon position shifts between the two genome builds.
+    """
 
-    def take_gene_name():
-        """
-        Take a gene name and get the corresponding XML file from
-        www.lrg-sequence.org/LRG"
-        - Take gene name as arg
-        - Return XML if gene name found in list, give user warning if gene
-          not found
-        """
-        pass
 
-        '''
-        #!/usr/bin/python 
-        #import sys 
-        import argparser
-        import urllib2
-            
-        #creating flags for arguments 
-        parser.add_arguments('-n', action='store', dest='exon_name', help='LRG gene name')
-        parser.add_arguments('-e', action='store', dest='exon_number', help='Insert exon number of interest')
-        parser.add_arguments('-b', action='store', dest='exon_before', help='Insert exon no. which comes before exon of interest')
-        parser.add_arguments('-a', action='store' dest='exon_after', help='Insert exon no. which comes after exon of interest')
+def parse_command_line_args():
+    pass
 
-        results = parser.parse.args()
-        print 'exon_name     =', results.exon_name
-        print 'exon_number   =', results.exon_number
-        print 'exon_before   =', results.exon_before
-        print 'exon_after    =', results.exon_after 
-        '''
+    # creating flags for arguments
 
-    def xml_scraper(gene):
-        # 1 access www.lrg-sequence.org/LRG
-        lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
-        lrg_list_html = lrg_response.read()
+    # parser.add_arguments('-n', action='store',
+    #                      dest='exon_name', help='LRG gene name')
+    # parser.add_arguments(
+    #     '-e', action='store', dest='exon_number', help='Insert exon number of interest')
+    # parser.add_arguments('-b', action='store', dest='exon_before',
+    #                      help='Insert exon no. which comes before exon of interest')
+    # parser.add_arguments('-a', action='store', dest='exon_after',
+    #                      help='Insert exon no. which comes after exon of interest')
 
-        lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
+    # results = parser.parse.args()
 
-        gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
+def xml_scraper(gene):
 
-        gene_row = gene_cell.find_parent("tr")
+    lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
+    lrg_list_html = lrg_response.read()
 
-        gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
-        gene_xml_href = gene_xml_link['href']
+    lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
 
-        lrg_xml_tree = ET.ElementTree(file=urllib2.urlopen(gene_xml_href))
-        root = lrg_xml_tree.getroot()
-        print root.tag, root.attrib
+    gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
 
-    def xml_parser(lrg_file):
+    gene_row = gene_cell.find_parent("tr")
+
+    gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
+    gene_xml_href = gene_xml_link['href']
+
+    lrg_xml_tree = ET.ElementTree(file=urllib2.urlopen(gene_xml_href))
+    root = lrg_xml_tree.getroot()
+    
+    return root
+
+def xml_parser(lrg_file):
     """
     Parse the LRG XML file and get the positions of the exons using LRG
     coordinate system, returning a dictionary of relative exon positions
     with the following structure (and start/stop positions on each genome
     build.
-
-    Usage
-    -----
-    xml_parser("LRG_9.xml")
-     -->
-        sample_dict = {
-        'lrg_id': "LRG_X",
-        'transcript1': {
-            'relative_exon_positions': {
-                'exon1': {
-                    'start': 128,
-                    'stop': 345
-                }
-                'exon2': {
-                    'start': 745,
-                    'stop': 923
-                }
-                'exon3': {
-                    'start': 1184,
-                    'stop': 1592
-                }
-                'exon4': {
-                    'start': 1808,
-                    'stop': 2140
-                }
-                'exon5': {
-                    'start': 2781,
-                    'stop': 3019
-                }
-            }
-        }
-        'transcript2': {
-            'relative_exon_positions': {
-                'exon1': {
-                    'start': 80,
-                    'stop': 194
-                }
-                'exon2': {
-                    'start': 555,
-                    'stop': 801
-                }
-                'exon3': {
-                    'start': 958,
-                    'stop': 1104
-                }
-            }
-        }
-        'build_GRCh37': {
-            'mapping_start': 187429875,
-            'mapping_stop': 187431770,
-        }
-        'build_GRCh38': {
-            'mapping_start': 179354041,
-            'mapping_stop': 179357191,
-        }
-
-    }
 
     """
 
@@ -180,59 +116,62 @@ def get_exon_shifts(cl_args):
 
     return position_dict
 
-    def plot_exon_shifts():
-        """
-        Take dict of exon positions and absolute genome coords and put into pandas
-        df.
+def plot_exon_shifts():
+    """
+    Take dict of exon positions and absolute genome coords and put into pandas
+    df.
 
-        Filter out irrelevant information from the dict, ie only take the exons of
-        interest.
+    Filter out irrelevant information from the dict, ie only take the exons of
+    interest.
 
-        Also, set the user's build at this point to determine 'their' exon positions
-        and the the shift they would like to know.
-        """
-        # take dictionaries from xml_parser and split dictionary into components
-        # define arguements:
-        # desired_exons = []
-        # create empty data frame:
+    Also, set the user's build at this point to determine 'their' exon positions
+    and the the shift they would like to know.
+    """
+    # take dictionaries from xml_parser and split dictionary into components
+    # define arguements:
+    # desired_exons = []
+    # create empty data frame:
 
-        """ |exon num | pos_start   |   pos_end  | relative shift |
-            __________| hg18 | hg19 | hg18 | hg19|________________|
-            |         |      |      |      |     |                |
-            |         |      |      |      |     |                |
+    """ |exon num | pos_start   |   pos_end  | relative shift |
+        __________| hg18 | hg19 | hg18 | hg19|________________|
+        |         |      |      |      |     |                |
+        |         |      |      |      |     |                |
 """
 
-        # for exon in desired_exons:
-        # add data as a row in the data frame
-        pass
+    # for exon in desired_exons:
+    # add data as a row in the data frame
+    pass
 
-    def display_results():
-        """
-        Takes df of relative exon positions and absolute genome coords and displays
-        on html template.
-        """
-        now = datetime.datetime.now()
+def display_results():
+    """
+    Takes df of relative exon positions and absolute genome coords and displays
+    on html template.
+    """
+    now = datetime.datetime.now()
 
-        current_date = now.strftime("%d-%m-%Y")
+    current_date = now.strftime("%d-%m-%Y")
 
-        # defining the pandas dataframe
-        test_dict = {"col1": [1, 2], "col2": [3, 4]}
-        mydataframe = pandas.DataFrame(data=test_dict)
-        mydataframe.head()
+    # defining the pandas dataframe
+    test_dict = {"col1": [1, 2], "col2": [3, 4]}
+    mydataframe = pandas.DataFrame(data=test_dict)
+    mydataframe.head()
 
-        # defining the html template
-        env = Environment(loader=FileSystemLoader('.'))
-        template = env.get_template("xml_report_template.html")
-        # define what to pass to the template
-        template_vars = {"hello": mydataframe.to_html(),
-                         "title": "This is the title"}
-        # pass the template vars to the template
-        html_out = template.render(template_vars)
-        # write to a html file named of the current date
-        file_out = open(current_date + ".html", "w")
-        file_out.write(html_out)
-        file_out.write(html_out.replace(
-            " border=\"1\" class=\"dataframe\"", ""))
-        file_out.close()
+    # defining the html template
+    env = Environment(loader=FileSystemLoader('.'))
+    template = env.get_template("xml_report_template.html")
+    # define what to pass to the template
+    template_vars = {"hello": mydataframe.to_html(),
+                     "title": "This is the title"}
+    # pass the template vars to the template
+    html_out = template.render(template_vars)
+    # write to a html file named of the current date
+    file_out = open(current_date + ".html", "w")
+    file_out.write(html_out)
+    file_out.write(html_out.replace(
+        " border=\"1\" class=\"dataframe\"", ""))
+    file_out.close()
 
-        pass
+    pass
+
+
+get_exon_shifts(sys.argv[1])
