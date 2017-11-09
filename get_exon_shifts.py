@@ -21,10 +21,50 @@ def get_exon_shifts(cl_args):
         """
         pass
 
-    def xml_parser():
+    def xml_parser(lrg_file):
         """
         Take XML file and return dict of relative exon positions and start and
         stop positions for both genome builds.
+
+        Usage
+        -----
+        xml_parser("LRG_9.xml")
+        ==> {gene_id: "SDHD",
+             lrg_id: "LRG_9",
+             rel_exons: {
+                 exon1: {
+                     start: 123,
+                     stop: 543,
+                 }
+                 exon2: {
+                     start: 876,
+                     stop: 934
+                 }
+                 ...
+             }
+             build_37: {
+                start: 1545693486,
+                stop: 1634534988,
+                exons: {
+                    exon1: {
+                        start: 157567567 + rel_exons[exon1]
+                        stop: ...
+                    }
+                    ...
+                }
+             }
+             build_38: {
+                start: 1545234654,
+                stop: 1634894564,
+                exons: {
+                    exon1: {
+                        start: 157567567 + rel_exons[exon1]
+                        stop: ...
+                    }
+                    ...
+                }
+    
+            }
 
         """
         pass
