@@ -34,7 +34,7 @@ def parse_command_line_args():
     pass
 
     # creating flags for arguments
-
+    # parser = argparse.ArgumentParser()
     # parser.add_arguments('-n', action='store',
     #                      dest='exon_name', help='LRG gene name')
     # parser.add_arguments(
