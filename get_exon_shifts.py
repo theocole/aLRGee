@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 import re
 
+import pprint
+
 """
 Command line tool to get LRG file,
 
@@ -27,7 +29,9 @@ def get_exon_shifts(gene_name):
     lrg_file_url = xml_scraper(gene_name)
     position_dict = xml_parser(lrg_file_url)
 
-    print(position_dict)
+    pprint.pprint(position_dict)
+
+    #results_dict = plot_exon_shifts(position_dict)
 
 
 def parse_command_line_args():
@@ -119,6 +123,7 @@ def xml_parser(lrg_file_url):
 
     return position_dict
 
+
 def plot_exon_shifts(position_dict):
     """
     Take dict of exon positions and absolute genome coords and put into pandas
@@ -131,97 +136,96 @@ def plot_exon_shifts(position_dict):
     and the the shift they would like to know.
     """
 
-	def calc_genomic_position(exon_num, hg_18_start, hg_18_stop, hg_19_start, hg_19_stop, exon_start, exon_stop):
-	''' takes in the coordinates relative to the exon and calculates
-		the genomic start and stop coordinates for each build. Also calculates 
-		the positional shift of the exon from hg19 to hg18'''
-	hg18ex_start = (hg_18_start+exon_start)
-	hg18ex_stop = (hg_18_stop+exon_stop)
-	hg19ex_start = (hg_19_start+exon_start)
-	hg19ex_stop = (hg_19_stop+exon_stop)
-	pos_shift = hg19ex_start - hg18ex_start
-	return [exon_num, hg18ex_start, hg18ex_stop, hg19ex_start, hg19ex_stop, pos_shift]
+    def calc_genomic_position(exon_num, hg_18_start, hg_18_stop, hg_19_start, hg_19_stop, exon_start, exon_stop):
+        ''' takes in the coordinates relative to the exon and calculates
+        the genomic start and stop coordinates for each build. Also calculates
+        the positional shift of the exon from hg19 to hg18'''
+        hg18ex_start = (hg_18_start + exon_start)
+        hg18ex_stop = (hg_18_stop + exon_stop)
+        hg19ex_start = (hg_19_start + exon_start)
+        hg19ex_stop = (hg_19_stop + exon_stop)
+        pos_shift = hg19ex_start - hg18ex_start
+        return [exon_num, hg18ex_start, hg18ex_stop, hg19ex_start, hg19ex_stop, pos_shift]
 
+    transcripts = []
+    transcripts_and_exons = []
+    exon_positions = []
+    resultsdict = {}
 
-	transcripts = []
-	transcripts_and_exons = []
-	exon_positions = []
-	resultsdict ={}
+    # separates dictionary into the 4 highest divisions
+    for key, value in position_dict.iteritems():
+        if key.startswith("build_GRCh38"):
+            build_38 = value
+        if key.startswith("build_GRCh37"):
+            build_37 = value
+        if key.startswith("lrg_id"):
+            LRG_id = value
+        if key.startswith("t"):
+            # creates a dictionary of transcript information
+            transcripts.append([str(key), value])
 
+    for key, value in build_38.iteritems():
+        # separates dictionary to identify start and stop variables
+        if key.startswith("mapping_start"):
+            build_19_start = value
+        if key.startswith("mapping_stop"):
+            build_19_stop = value
 
-	# separates dictionary into the 4 highest divisions
-	for key, value in position_dict.iteritems():
-		if key.startswith("build_GRCh38"):
-			build_38 = value
-		if key.startswith("build_GRCh37"):
-			build_37 = value
-		if key.startswith("lrg_id"):
-			LRG_id = value
-		if key.startswith("t"):
-			# creates a dictionary of transcript information
-			transcripts.append([str(key), value])
+    for key, value in build_37.iteritems():
+        # separates dictionary to identify start and stop variables
+        if key.startswith("mapping_start"):
+            build_18_start = value
+        if key.startswith("mapping_stop"):
+            build_18_stop = value
 
+    for entry in transcripts:
+        transcript_number = entry[0]
+        exon_dict = entry[1]
+        for key, value in exon_dict.iteritems():
+            # creates a list of lists containing [transcripts and their exons]
+            transcripts_and_exons.append([transcript_number, value])
 
-	for key, value in build_38.iteritems():
-		# separates dictionary to identify start and stop variables
-		if key.startswith("mapping_start"):
-			build_19_start = value
-		if key.startswith("mapping_stop"):
-			build_19_stop = value
+    for entry in transcripts_and_exons:
+        # separates out the transcript number from the exon information
+        transcript = entry[0]
+        exon_positions.append([transcript])
+        exon_dict = entry[1]
+        for entry in exon_positions:
+            # adds each exon to the relevent transcript number entry in exon_positions list of lists
+            if transcript in entry:
+                index = exon_positions.index(entry)
+        for key, value in exon_dict.iteritems():
+            # separates out exon number from the start and stop dictionary
+            exon_number = key
+            exon_start_stop_dict = value
+            print exon_start_stop_dict
+            for one, two in exon_start_stop_dict.iteritems():
+                # separates the start and stop values in the dictionary
+                if one == "start":
+                    start = two
+                if one == "stop":
+                    stop = two
+                    # adds exon num and its start and stop to the revelent transcript
+                    exon_positions[index].append([exon_number, start, stop])
 
-	for key, value in build_37.iteritems():
-		# separates dictionary to identify start and stop variables
-		if key.startswith("mapping_start"):
-			build_18_start = value
-		if key.startswith("mapping_stop"):
-			build_18_stop = value
+    for entry in exon_positions:
+        # for each transcript go through each exon and pass to calculator
+        transcript = entry[0]
+        exons = entry[1:]
+        for detail in exons:
+            exon_num = detail[0]
+            exon_start = detail[1]
+            exon_stop = detail[2]
+            dataline = calc_genomic_position(exon_num, build_18_start, build_18_stop,
+                                             build_19_start, build_19_stop, exon_start, exon_stop)
+            # if the transcript num is not in the results dictionary add the transcript as the key and the dataline as a value
+            if transcript not in resultsdict:
+                resultsdict[transcript] = [dataline]
+            # if the transcript num is already in the dictionary just append the dataline to the value list of lists
+            else:
+                resultsdict[transcript].append(dataline)
 
-	for entry in transcripts:
-		transcript_number = entry[0]
-		exon_dict = entry[1]
-		for key, value in exon_dict.iteritems():
-			# creates a list of lists containing [transcripts and their exons]
-			transcripts_and_exons.append([transcript_number, value])
-
-	for entry in transcripts_and_exons:
-		# separates out the transcript number from the exon information
-		transcript = entry[0]
-		exon_positions.append([transcript])
-		exon_dict = entry[1]
-		for entry in exon_positions:
-		# adds each exon to the relevent transcript number entry in exon_positions list of lists
-			if transcript in entry:
-				index = exon_positions.index(entry)
-		for key, value in exon_dict.iteritems():
-			# separates out exon number from the start and stop dictionary
-			exon_number = key
-			exon_start_stop_dict = value
-			for one, two in exon_start_stop_dict.iteritems():
-			# separates the start and stop values in the dictionary
-				if one == "start":
-					start = two
-				if one == "stop":
-					stop = two
-					# adds exon num and its start and stop to the revelent transcript
-					exon_positions[index].append([exon_number, start, stop])
-
-	for entry in exon_positions:
-		# for each transcript go through each exon and pass to calculator
-		transcript = entry[0]
-		exons = entry[1:]
-		for detail in exons:
-			exon_num = detail[0]
-			exon_start = detail[1]
-			exon_stop = detail[2]
-			dataline = calc_genomic_position(exon_num, build_18_start, build_18_stop, build_19_start, build_19_stop, exon_start, exon_stop)
-			# if the transcript num is not in the results dictionary add the transcript as the key and the dataline as a value
-			if transcript not in resultsdict:
-				resultsdict[transcript] = [dataline]
-			# if the transcript num is already in the dictionary just append the dataline to the value list of lists
-			else:
-				resultsdict[transcript].append(dataline)
-
-	return resultsdict
+    return resultsdict
 
     # take dictionaries from xml_parser and split dictionary into components
     # define arguements:
@@ -237,6 +241,7 @@ def plot_exon_shifts(position_dict):
     # for exon in desired_exons:
     # add data as a row in the data frame
     pass
+
 
 def display_results():
     """
