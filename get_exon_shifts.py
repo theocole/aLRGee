@@ -22,18 +22,39 @@ def get_exon_shifts(cl_args):
         pass
 
 <<<<<<< HEAD
-        #!/usr/bin/python 
-        # import sys 
-        # def take_gene_name ():
-            #arg1[gene_name]
-            #arg2[exon_of_interest]
-            #arg3[exon_before]
-            #arg4[exon_after]
 
-            #if gene_name in URL:
+        '''
+    #!/usr/bin/python 
+    #import sys 
+    import argparser
+    import urllib2
+        
+    #creating flags for arguments 
+        parser.add_arguments('-n', action='store', dest='exon_name', help='LRG gene name')
+        parser.add_arguments('-e', action='store', dest='exon_number', help='Insert exon number of interest')
+        parser.add_arguments('-b', action='store', dest='exon_before', help='Insert exon no. which comes before exon of interest')
+        parser.add_arguments('-a', action='store' dest='exon_after', help='Insert exon no. which comes after exon of interest')
+
+        results = parser.parse.args()
+        print 'exon_name     =', results.exon_name
+        print 'exon_number   =', results.exon_number
+        print 'exon_before   =', results.exon_before
+        print 'exon_after    =', results.exon_after 
+
+    
+    def gene_name(name):
+        page= urllib2.urlopen("www.lrg-sequence.org/LRG").read()
+        print re.findall(name,page)
+        print page.find(name)
+    if 
+
+    def take_gene_name(gene_name, exon_number, exon_before, exon_after):
+
+          #if gene_name "www.lrg-sequence.org/LRG":
                 #return XML 
             #else:
             #print"Error gene name not found"
+        '''
         ####
     def xml_parser():
 =======
