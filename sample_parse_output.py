@@ -1,6 +1,6 @@
 sample_dict = {
     'lrg_id': "LRG_X",
-    'transcript1': {
+    't1': {
         'relative_exon_positions': {
             'exon1': {
                 'start': 128,
@@ -24,7 +24,7 @@ sample_dict = {
             }
         }
     }
-    'transcript2': {
+    't2': {
         'relative_exon_positions': {
             'exon1': {
                 'start': 80,
