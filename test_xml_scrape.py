@@ -11,8 +11,16 @@ def xml_scraper(gene):
 
     lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
 
-    gene_row = lrg_soup.findAll("td", text=re.compile("^" + gene + "$"))
-    print gene_row
+    gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
+
+    gene_row = gene_cell.find_parent("tr")
+
+    gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
+    gene_xml_href = gene_xml_link['href']
+
+    lrg_xml_tree = ET.ElementTree(file=urllib2.urlopen(gene_xml_href))
+    root = lrg_xml_tree.getroot()
+    print root.tag, root.attrib
 
 
     #find table row with genename = gene
