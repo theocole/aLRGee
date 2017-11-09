@@ -144,16 +144,22 @@ def get_exon_shifts(cl_args):
 
         current_date = now.strftime("%d-%m-%Y")
 
+        # defining the pandas dataframe
         test_dict = {"col1": [1,2], "col2": [3,4]}
         mydataframe = pandas.DataFrame(data=test_dict)
         mydataframe.head()
 
+        # defining the html template
         env = Environment(loader=FileSystemLoader('.'))
         template = env.get_template("xml_report_template.html")
+        # define what to pass to the template
         template_vars = {"hello": mydataframe.to_html(), "title" : "This is the title"}
+        # pass the template vars to the template
         html_out = template.render(template_vars)
+        # write to a html file named of the current date
         file_out = open(current_date+".html", "w")
         file_out.write(html_out)
+        file_out.write(html_out.replace(" border=\"1\" class=\"dataframe\"", ""))
         file_out.close()
 
         pass
