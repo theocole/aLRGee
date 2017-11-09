@@ -17,8 +17,15 @@ Command line tool to get LRG file,
 Usage:
 ------
 
-alrgee.py <gene_name> -b <build_number> -e <exon_of_interest> [<exons_before>] [<exons_after>]
+alrgee.py <gene_name> -e <exon_of_interest> [<exons_before>] [<exons_after>]
 """
+def main():
+    gene_name = -n "gene"
+    exon_number = -e "exon"
+    exon_before = -b "exon_b"
+    exon_after = -a "exon_a"
+    for g in gene_name:
+        
 
 
 def get_exon_shifts(gene_name):
