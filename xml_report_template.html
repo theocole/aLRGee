@@ -14,8 +14,10 @@
   {{transcript}}
 {% endfor %}
 
-{% for table in data %}
-  {{table}}
-{% endfor %}
+{% for entry in data %}
+  {% for line in entry %}
+    {{line}}
+  {% endfor %}
+{% endfor%}
 </body>
 </html>

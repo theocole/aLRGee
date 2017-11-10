@@ -164,13 +164,14 @@ for key, value in args.iteritems():
     if key == "gene_name":
         gene_name = value
 
+
 dataframes = []
 transcripts = []
 
 if exon_of_interest != "blank":
     for key, value in results_dict.iteritems():
         transcript = key
-        transcripts.append(transcript)
+        dataframes.append([transcript])
         headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
         newlist = []
         exons_before_list = []
@@ -195,7 +196,7 @@ if exon_of_interest != "blank":
             newlist = EOI
         df = pandas.DataFrame(newlist, columns=headers)
         myfinisheddata = df.to_html(index=False)
-        dataframes.append(myfinisheddata)
+        dataframes[-1].append(myfinisheddata)
 
 else:
     for key, value in results_dict.iteritems():
@@ -212,10 +213,6 @@ else:
 
 
 
-print len(dataframes)
-
-
-
 now = datetime.datetime.now()
 
 current_date = now.strftime("%d-%m-%Y")
@@ -223,7 +220,7 @@ current_date = now.strftime("%d-%m-%Y")
 env = Environment(loader=FileSystemLoader('.'))
 template = env.get_template("xml_report_template.html")
 # define what to pass to the template
-template_vars = {"title": "Results for "+ gene_name, "transcripts": transcripts, "data": dataframes,}
+template_vars = {"title": "Results for "+ gene_name, "transcripts": transcripts,"data": dataframes,}
 # pass the template vars to the template
 html_out = template.render(template_vars)
 # write to a html file named of the current date
