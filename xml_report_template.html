@@ -22,21 +22,14 @@
             <h4>Exon shifts for gene:</h4>
             <h1><span class="glyphicon glyphicon-transfer" aria_hidden="true"></span> {{title}}</h1>
             <hr>
-            {{hello}}
-        </div>
-    </body>
-</html>
-<head lang="en">
-    <meta charset="utf-8">
-    <h1>{{title}}</h1>
-</head>
-<body>
+            <body>
 {% for transcript in transcripts %}
-  {{transcript}}
+  <h2>Transcript {{transcript[1]}}</h2>
 {% endfor %}
 
 {% for table in data %}
   {{table}}
 {% endfor %}
-</body>
+        </div>
+    </body>
 </html>

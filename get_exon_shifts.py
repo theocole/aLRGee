@@ -33,7 +33,7 @@ def main():
     pprint.pprint(position_dict)
     results_dict = plot_exon_shifts(position_dict)
 
-    display_results()
+    display_results(results_dict, args)
 
 
 def parse_args():
@@ -195,7 +195,7 @@ def xml_parser(lrg_file_url):
 
 
 def plot_exon_shifts(position_dict):
-    def calc_genomic_position(exon_num, hg_18_start, hg_18_stop, hg_19_start, hg_19_stop, exon_start, exon_stop):
+    def calc_genomic_position(exon_num, hg_18_start, hg_19_start, hg_18_stop, hg_19_stop, exon_start, exon_stop):
         hg18ex_start = (hg_18_start + exon_start)
         hg18ex_stop = (hg_18_stop + exon_stop)
         hg19ex_start = (hg_19_start + exon_start)
@@ -271,12 +271,12 @@ def plot_exon_shifts(position_dict):
     return resultsdict
 
 
-def display_results(resultsdict):
+def display_results(resultsdict, args):
     """
     Takes df of relative exon positions and absolute genome coords and displays
     on html template.
     """
-    
+
     for key, value in args.iteritems():
         if key == "exon_of_interest":
             if value is not None:
