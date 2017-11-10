@@ -29,52 +29,50 @@ def main():
     args = parse_args()
     lrg_file_url = xml_scraper(args['gene_name'])
     position_dict = xml_parser(lrg_file_url)
+
+    pprint.pprint(position_dict)
     results_dict = plot_exon_shifts(position_dict)
+
 
 def parse_args():
 
-    # The add_argumnets method is used to create flags for arguments; a help page with description of each flag 
-     #is created simultaneously. The help page can be accessed using --help.
+    # The add_argumnets method is used to create flags for arguments; a help page with description of each flag
+     # is created simultaneously. The help page can be accessed using --help.
     # "action"- The action to be taken when the flag is encountered, in this instrance the flag shold be stored.
     # "dest"- refers to the attribute associated to the flag
     # "help"- provides a brief description of the function of the flag
-    # "required"- Detting it as TRUE, makes the flag a required command line option. 
+    # "required"- Detting it as TRUE, makes the flag a required command line option.
 
     parser = argparse.ArgumentParser(description="Take gene name and exons of interest.")
     parser.add_argument(
-        '-n', action='store', dest='gene_name', required='TRUE', help='HGNC gene name.'
+        '-g', action='store', dest='gene_name', required='TRUE', help='HGNC gene name.'
     )
     parser.add_argument(
-        '-e', action='store', dest='exon_of_interest', help='Exon you would like to display a shift calculation for.'
+        '-e', action='store', dest='exon_of_interest', type=int, help='Exon you would like to display a shift calculation for.'
     )
     parser.add_argument(
-        '-b', action='store', dest='exons_before', help='The number of exons before your exon of interest.'
+        '-b', action='store', dest='exons_before', type=int, help='The number of exons before your exon of interest.'
     )
     parser.add_argument(
-        '-a', action='store', dest='exons_after', help='The number of exons after your exon of interest.'
+        '-a', action='store', dest='exons_after', type=int, help='The number of exons after your exon of interest.'
     )
-
-    ## TODO: assert that arguments passed conform to :
-        # - gene name = string
-        # - exon numbers = int IFF they are present
 
     command_args = parser.parse_args()
-
     return vars(command_args)
 
 
 def xml_scraper(gene):
-'''
-xml_scrapper function uses the urllib2 module to open the LRG sequence URL and puts the html 
-in lrg_list_html
-'''
+    '''
+    xml_scrapper function uses the urllib2 module to open the LRG sequence URL and puts the html 
+    in lrg_list_html
+    '''
     lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
     lrg_list_html = lrg_response.read()
 
-#BeautifulSoup library to pull data out of the html file and transfer it into lrg_soup. 
+    # BeautifulSoup library to pull data out of the html file and transfer it into lrg_soup.
     lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
 
-#lrg.soup.find searches for the tag "td" associated with the absolute gene name provided 
+    # lrg.soup.find searches for the tag "td" associated with the absolute gene name provided
     gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
 
     try:
@@ -132,12 +130,25 @@ def xml_parser(lrg_file_url):
     lrg_tree = ET.ElementTree(file=urllib2.urlopen(lrg_file_url))
 
     lrg_root = lrg_tree.getroot()
+    try:
+        # is the LRG root tagged as an LRG file?
+        assert lrg_root.tag == 'lrg'
+    except AssertionError:
+        print "Warning! File is not tagged as conforming to LRG schema!"
+        print "Aborting..."
+        quit()
+    print "Parsed LRG file."
+
+    print "Extracting exon coordinates from LRG file..."
+
     fixed, updatable = lrg_root.getchildren()
 
     lrg_id = fixed.find("id").text
     position_dict["lrg_id"] = lrg_id
 
+    # get all transcripts for the gene
     transcripts = lrg_root.iter("transcript")
+
     for transcript in transcripts:
         if 'name' in transcript.attrib:
             transcript_name = transcript.attrib['name']
@@ -152,6 +163,14 @@ def xml_parser(lrg_file_url):
                 exon_position_dict = transcript_dict[exon_label] = {}
                 for coords in exon:
                     if coords.attrib["coord_system"] == lrg_id:
+
+                        # exon start should map before exon end...
+                        assert int(coords.attrib["start"]) < int(coords.attrib["end"])
+
+                        # exon should be at least 1 codon long!
+                        assert int(coords.attrib["end"]) - int(coords.attrib["start"]) >= 3
+
+
                         exon_position_dict["start"] = coords.attrib["start"]
                         exon_position_dict["end"] = coords.attrib["end"]
 
@@ -256,6 +275,8 @@ def display_results():
     Takes df of relative exon positions and absolute genome coords and displays
     on html template.
     """
+
+
     now = datetime.datetime.now()
 
     current_date = now.strftime("%d-%m-%Y")
