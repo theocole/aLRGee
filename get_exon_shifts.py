@@ -204,7 +204,7 @@ def plot_exon_shifts(position_dict):
             if key == "end":
                 stop_coord = value
 
-                exon_positions[index].append([exon_num, start, stop_coord])     
+                exon_positions[index].append([exon_num, start, stop_coord])
 
 
     for entry in exon_positions:
@@ -223,50 +223,91 @@ def plot_exon_shifts(position_dict):
     return resultsdict
 
 
-def display_results():
+def display_results(resultsdict):
     """
     Takes df of relative exon positions and absolute genome coords and displays
     on html template.
     """
+    for key, value in args.iteritems():
+        if key == "exon_of_interest":
+            if value is not None:
+                exon_of_interest = int(value)
+            else:
+                exon_of_interest = "blank"
+        if key == "exons_before":
+            if value is not None:
+                exons_before = int(value)
+            else:
+                exons_before = 0
+        if key == "exons_after":
+            if value is not None:
+                exons_after = int(value)
+            else:
+                exons_after = 0
+        if key == "gene_name":
+            gene_name = value
+
+    dataframes = []
+    transcripts = []
+
+    if exon_of_interest != "blank":
+        for key, value in resultsdict.iteritems():
+            transcript = key
+            transcripts.append(transcript)
+            headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
+            newlist = []
+            exons_before_list = []
+            exons_after_list = []
+
+            for entry in value:
+                exon_number = int(entry[0].strip("exon"))
+                if exon_number == exon_of_interest:
+                    EOI = [entry]
+                if exon_number > exon_of_interest:
+                    if exon_number <= (exon_of_interest + exons_after):
+                        exons_after_list.append(entry)
+                if exon_number < exon_of_interest:
+                    if exon_number >= (exon_of_interest - exons_before):
+                        exons_before_list.append(entry)
+            if len(exons_before_list) >= 1:
+                if len(exons_after_list) >= 1:
+                    newlist = exons_before_list+EOI+exons_after_list
+                else:
+                    newlist = exons_before_list+EOI
+            else:
+                newlist = EOI
+            df = pandas.DataFrame(newlist, columns=headers)
+            myfinisheddata = df.to_html(index=False)
+            dataframes.append(myfinisheddata)
+
+    else:
+        for key, value in resultsdict.iteritems():
+            transcript = key
+            transcripts.append(transcript)
+            headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
+            newlist = []
+            for entry in value:
+                newlist.append(entry)
+
+            df = pandas.DataFrame(newlist, columns=headers)
+            myfinisheddata = df.to_html(index=False)
+            dataframes.append(myfinisheddata)
+
+
+
+
     now = datetime.datetime.now()
 
     current_date = now.strftime("%d-%m-%Y")
 
-    # defining the pandas dataframe
-    test_dict = {"col1": [1, 2], "col2": [3, 4]}
-    mydataframe = pandas.DataFrame(data=test_dict)
-    mydataframe.head()
-
-    # defining the html template
     env = Environment(loader=FileSystemLoader('.'))
     template = env.get_template("xml_report_template.html")
     # define what to pass to the template
-    template_vars = {"hello": mydataframe.to_html(),
-                     "title": "This is the title"}
+    template_vars = {"title": "Results for "+ gene_name, "transcripts": transcripts,"data": dataframes,}
     # pass the template vars to the template
     html_out = template.render(template_vars)
     # write to a html file named of the current date
     file_out = open(current_date + ".html", "w")
-    file_out.write(html_out)
     file_out.write(html_out.replace(
         " border=\"1\" class=\"dataframe\"", ""))
     file_out.close()
-
-    pass
-
-    # take dictionaries from xml_parser and split dictionary into components
-    # define arguements:
-    # desired_exons = []
-    # create empty data frame:
-
-    """ |exon num | pos_start   |   pos_end  | relative shift |
-        __________| hg18 | hg19 | hg18 | hg19|________________|
-        |         |      |      |      |     |                |
-        |         |      |      |      |     |                |
-"""
-
-    # for exon in desired_exons:
-    # add data as a row in the data frame
-
-
-get_exon_shifts()

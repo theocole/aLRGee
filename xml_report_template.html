@@ -10,7 +10,12 @@
     <h1>{{title}}</h1>
 </head>
 <body>
+{% for transcript in transcripts %}
+  {{transcript}}
+{% endfor %}
 
-{{hello}}
+{% for table in data %}
+  {{table}}
+{% endfor %}
 </body>
 </html>
