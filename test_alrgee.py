@@ -1,4 +1,4 @@
-class RuntimeTests(object):
+class TestSuite(object):
     """docstring for RuntimeTests"""
 
     def canAccessLRG():
