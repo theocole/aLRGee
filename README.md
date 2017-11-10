@@ -14,7 +14,7 @@ To run the tool in command line:
 
 	>>  python aLRGee -n <gene name> -e <exon of interest> -b <Number of exons before EOF*> -a <Number  of exons after the EOF*>
 
-EOF= Exon of interest 
+*EOF= Exon of interest*
 
 Required arguments: 
 -n -e
@@ -38,7 +38,7 @@ Example:
 
 To run the tool you will need to have python 2.6 installed, as the some of the modules used require python 2.6 or over. 
 
-Refer to https://www.python.org/download/releases for instructions on how to update/dowload python 2.6 or over 
+Refer to [Python website] (https://www.python.org/download/releases) for instructions on how to update/dowload python 2.6 or over 
 
 ## aLRGee explained
 
@@ -53,7 +53,7 @@ def main():
     results_dict = plot_exon_shifts(position_dict)
 
 
-#Function: def parse_args():
+**Function: def parse_args():**
 
  The add_argumnets method is used to create flags for arguments; a help page with description of each flag is created simultaneously. The help page can be accessed using --help.
    action- The action to be taken when the flag is encountered, in this instrance the flag shold be stored.
@@ -69,7 +69,7 @@ def main():
     )
 
 
-#Function: def xml_scraper(gene):
+**Function: def xml_scraper(gene):**
 
 xml_scrapper function uses urllib2 to open the LRG sequence URL and puts the html in a dictionary called lrg_list_html. 
 The BeautifulSoup library is used to pull data out of the html file and transfer it into another dictionary called lrg_soup. 
@@ -94,26 +94,31 @@ If the associated xml file is found it will print:
 
 	>> "LRG file found at:", NF1_xml_href
 
-#Function- def xml_parser(lrg_file_url):
+**Function- def xml_parser(lrg_file_url):**
 
  Susequently, once aLRGee obtains the required xml file the tool will use the library ElementTree to parse the LRG XML file and get the positions of the exons using LRG coordinate system, returning a dictionary of relative exon positions (and start/stop positions on each genome build.
 
-#Functions- def display_results():
+**Functions- def display_results():**
 
 Takes dataframes of relative exon positions and absolute genome coords and displays on html template.
 
-#Example of output for NF1 gene: 
+**Example of output for NF1 gene** 
 
 t2
-Exon number	GrCh37_Start	GrCh38_Start	GrCh37_stop	GrCh38_stop	Positional Shift
-	exon3		29486029	29775812		31159011	31448794	1672982
-	exon4		29490205	29780095		31163187	31453077	1672982
-	exon5		29496910	29786716		31169892	31459698	1672982
+
+|Exon number  |	GrCh37_Start |	GrCh38_Start |	GrCh37_stop	| GrCh38_stop |	Positional Shift|
+|-------------|--------------|---------------|--------------|-------------|-----------------|
+|	exon3	  |	29486029	 |    29775812	 |	31159011	|  31448794	  |	1672982			|
+|	exon4	  |	29490205	 |    29780095	 |	31163187	|  31453077	  |	1672982			|
+|	exon5	  |	29496910	 |    29786716	 |	31169892	|  31459698	  |	1672982			|
+
 t1
-Exon number	GrCh37_Start	GrCh38_Start	GrCh37_stop	GrCh38_stop	Positional Shift
-	exon3		29486029	29775812		31159011	31448794	1672982
-	exon4		29490205	29780095		31163187	31453077	1672982
-	exon5		29496910	29786716		31169892	31459698	1672982
+
+|Exon number  |	GrCh37_Start |	GrCh38_Start |	GrCh37_stop	|  GrCh38_stop | Positional Shift|
+|-------------|--------------|---------------|--------------|--------------|-----------------|
+|	exon3	  |	29486029	 |	29775812	 |	31159011 	|  31448794	   | 1672982		 |
+|	exon4	  |	29490205	 |	29780095	 |	31163187	|  31453077	   | 1672982         |
+|	exon5	  |	29496910	 |	29786716	 |	31169892	|  31459698	   | 1672982         |
 
 
 										<END OF DOCUMENTATION >
