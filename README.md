@@ -147,7 +147,7 @@ Exon number	GrCh37_Start	GrCh38_Start	GrCh37_stop	GrCh38_stop	Positional Shift
 
 
 
-mbjjhghg
+
 
 
 
