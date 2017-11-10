@@ -21,7 +21,7 @@ alrgee.py <gene_name> -e <exon_of_interest> [<exons_before>] [<exons_after>]
 """
 
 
-def get_exon_shifts():
+def main():
     """
     Run through the whole process: take a gene name and output HTML report
     of exon position shifts between the two genome builds.
@@ -66,14 +66,6 @@ def parse_args():
         # - exon numbers = int IFF they are present
 
     command_args = parser.parse_args()
-
-
-    try:
-        assert type(vars(command_args)["gene_name"]) is str
-    except AssertionError:
-        print "Please provide a string for gene name."
-        print "Aborting..."
-        quit()
 
     return vars(command_args)
 
@@ -300,4 +292,5 @@ def display_results():
     # add data as a row in the data frame
 
 
-get_exon_shifts()
+if __name__ == "__main__":
+    main()
