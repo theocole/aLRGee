@@ -20,7 +20,7 @@ alrgee.py <gene_name> -e <exon_of_interest> [<exons_before>] [<exons_after>]
 """
 
 
-def get_exon_shifts():
+def main():
     """
     Run through the whole process: take a gene name and output HTML report
     of exon position shifts between the two genome builds.
@@ -30,9 +30,6 @@ def get_exon_shifts():
     lrg_file_url = xml_scraper(args['gene_name'])
     position_dict = xml_parser(lrg_file_url)
     results_dict = plot_exon_shifts(position_dict)
-
-    pprint.pprint(results_dict)
-
 
 def parse_args():
 
@@ -57,7 +54,12 @@ def parse_args():
         '-a', action='store', dest='exons_after', help='The number of exons after your exon of interest.'
     )
 
+    ## TODO: assert that arguments passed conform to :
+        # - gene name = string
+        # - exon numbers = int IFF they are present
+
     command_args = parser.parse_args()
+
     return vars(command_args)
 
 
@@ -75,11 +77,43 @@ in lrg_list_html
 #lrg.soup.find searches for the tag "td" associated with the absolute gene name provided 
     gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
 
-#gene_
+    try:
+        print "Accessing LRG database..."
+        lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
+        print "Got list of LRGs."
+        lrg_list_html = lrg_response.read()
+    except Exception, e:
+        print "WARNING: Could not connect to service."
+        print e
+        print "Aborting process..."
+        quit()
+
+    print "Reading in list of LRG files..."
+    lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
+
+    print "Attempting to find gene of interest."
+    gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
+
+    try:
+        assert gene_cell != None
+    except AssertionError:
+        print "Could not find gene!"
+        print "Aborting..."
+        quit()
+
+    print "Found gene!"
     gene_row = gene_cell.find_parent("tr")
 
-    gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
-    gene_xml_href = gene_xml_link['href']
+    print "Accessing LRG file."
+    try:
+        gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
+        gene_xml_href = gene_xml_link['href']
+        assert gene_xml_href.endswith(".xml")
+    except AssertionError:
+        print "Could not find a valid LRG file associated with gene."
+        print "Aborting..."
+        quit()
+    print "LRG file found at:", gene_xml_href
 
     return gene_xml_href
 
@@ -142,18 +176,17 @@ def xml_parser(lrg_file_url):
 
 def plot_exon_shifts(position_dict):
     def calc_genomic_position(exon_num, hg_18_start, hg_18_stop, hg_19_start, hg_19_stop, exon_start, exon_stop):
-        hg18ex_start = (hg_18_start+exon_start)
-        hg18ex_stop = (hg_18_stop+exon_stop)
-        hg19ex_start = (hg_19_start+exon_start)
-        hg19ex_stop = (hg_19_stop+exon_stop)
+        hg18ex_start = (hg_18_start + exon_start)
+        hg18ex_stop = (hg_18_stop + exon_stop)
+        hg19ex_start = (hg_19_start + exon_start)
+        hg19ex_stop = (hg_19_stop + exon_stop)
         pos_shift = hg19ex_start - hg18ex_start
         return [exon_num, hg18ex_start, hg18ex_stop, hg19ex_start, hg19ex_stop, pos_shift]
-
 
     transcripts = []
     transcripts_and_exons = []
     exon_positions = []
-    resultsdict ={}
+    resultsdict = {}
 
     for key, value in position_dict.iteritems():
         if key.startswith("build_GRCh38"):
@@ -165,20 +198,17 @@ def plot_exon_shifts(position_dict):
         if key.startswith("t"):
             transcripts.append([str(key), value])
 
-
     for key, value in build_38.iteritems():
         if key.startswith("start"):
             build_19_start = int(value)
         if key.startswith("end"):
             build_19_stop = int(value)
 
-
     for key, value in build_37.iteritems():
         if key.startswith("start"):
             build_18_start = int(value)
         if key.startswith("end"):
             build_18_stop = int(value)
-
 
     for entry in transcripts:
         transcript_number = entry[0]
@@ -187,7 +217,6 @@ def plot_exon_shifts(position_dict):
             exon_number = key
             exon_start_stop = value
             transcripts_and_exons.append([transcript_number, exon_number, value])
-
 
     for entry in transcripts_and_exons:
         transcript = entry[0]
@@ -203,8 +232,7 @@ def plot_exon_shifts(position_dict):
             if key == "end":
                 stop_coord = value
 
-                exon_positions[index].append([exon_num, start, stop_coord])     
-
+                exon_positions[index].append([exon_num, start, stop_coord])
 
     for entry in exon_positions:
         transcript = entry[0]
@@ -213,7 +241,8 @@ def plot_exon_shifts(position_dict):
             exon_num = detail[0]
             exon_start = int(detail[1])
             exon_stop = int(detail[2])
-            dataline = calc_genomic_position(exon_num, build_18_start, build_18_stop, build_19_start, build_19_stop, exon_start, exon_stop)
+            dataline = calc_genomic_position(exon_num, build_18_start, build_18_stop,
+                                             build_19_start, build_19_stop, exon_start, exon_stop)
             if transcript not in resultsdict:
                 resultsdict[transcript] = [dataline]
             else:
@@ -268,4 +297,5 @@ def display_results():
     # add data as a row in the data frame
 
 
-get_exon_shifts()
+if __name__ == "__main__":
+    main()
