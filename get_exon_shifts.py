@@ -236,7 +236,7 @@ def plot_exon_shifts(position_dict):
         for key, value in exon_dict.iteritems():
             exon_number = key
             exon_start_stop = value
-            transcripts_and_exons.append([transcript_number, exon_number, value])
+            transcripts_and_exons.append(["Transcript: " + transcript_number, exon_number, value])
 
     for entry in transcripts_and_exons:
         transcript = entry[0]
