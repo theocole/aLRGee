@@ -102,6 +102,39 @@ If the associated xml file is found it will print:
 Function- def xml_parser(lrg_file_url):
 ######################################
 
- Parse the LRG XML file and get the positions of the exons using LRG coordinate system, returning a dictionary of relative exon positions with the following structure (and start/stop positions on each genome build.
+ Susequently, once aLRGee obtains the required xml file the tool will use the library ElementTree to parse the LRG XML file and get the positions of the exons using LRG coordinate system, returning a dictionary of relative exon positions (and start/stop positions on each genome build.
+
+Functions- def display_results():
+######################################
+
+ Takes dataframes of relative exon positions and absolute genome coords and displays on html template.
+
+Example of output for NF1 gene: 
+
+t2
+Exon number	GrCh37_Start	GrCh38_Start	GrCh37_stop	GrCh38_stop	Positional Shift
+	exon3		29486029	29775812		31159011	31448794	1672982
+	exon4		29490205	29780095		31163187	31453077	1672982
+	exon5		29496910	29786716		31169892	31459698	1672982
+t1
+Exon number	GrCh37_Start	GrCh38_Start	GrCh37_stop	GrCh38_stop	Positional Shift
+	exon3		29486029	29775812		31159011	31448794	1672982
+	exon4		29490205	29780095		31163187	31453077	1672982
+	exon5		29496910	29786716		31169892	31459698	1672982
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
