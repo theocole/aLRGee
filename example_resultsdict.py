@@ -201,7 +201,7 @@ if exon_of_interest != "blank":
 else:
     for key, value in results_dict.iteritems():
         transcript = key
-        transcripts.append(transcript)
+        transcripts.append([transcript])
         headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
         newlist = []
         for entry in value:
@@ -209,7 +209,7 @@ else:
 
         df = pandas.DataFrame(newlist, columns=headers)
         myfinisheddata = df.to_html(index=False)
-        dataframes.append(myfinisheddata)
+        dataframes[-1].append(myfinisheddata)
 
 
 
@@ -228,3 +228,5 @@ file_out = open(current_date + ".html", "w")
 file_out.write(html_out.replace(
     " border=\"1\" class=\"dataframe\"", ""))
 file_out.close()
+
+print len(dataframes)

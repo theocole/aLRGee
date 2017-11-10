@@ -33,6 +33,8 @@ def main():
     pprint.pprint(position_dict)
     results_dict = plot_exon_shifts(position_dict)
 
+    display_results(results_dict, args)
+
 
 def parse_args():
 
@@ -170,7 +172,6 @@ def xml_parser(lrg_file_url):
                         # exon should be at least 1 codon long!
                         assert int(coords.attrib["end"]) - int(coords.attrib["start"]) >= 3
 
-
                         exon_position_dict["start"] = coords.attrib["start"]
                         exon_position_dict["end"] = coords.attrib["end"]
 
@@ -194,7 +195,7 @@ def xml_parser(lrg_file_url):
 
 
 def plot_exon_shifts(position_dict):
-    def calc_genomic_position(exon_num, hg_18_start, hg_18_stop, hg_19_start, hg_19_stop, exon_start, exon_stop):
+    def calc_genomic_position(exon_num, hg_18_start, hg_19_start, hg_18_stop, hg_19_stop, exon_start, exon_stop):
         hg18ex_start = (hg_18_start + exon_start)
         hg18ex_stop = (hg_18_stop + exon_stop)
         hg19ex_start = (hg_19_start + exon_start)
@@ -270,12 +271,11 @@ def plot_exon_shifts(position_dict):
     return resultsdict
 
 
-def display_results(resultsdict):
+def display_results(resultsdict, args):
     """
     Takes df of relative exon positions and absolute genome coords and displays
     on html template.
     """
-
     for key, value in args.iteritems():
         if key == "exon_of_interest":
             if value is not None:
@@ -295,13 +295,14 @@ def display_results(resultsdict):
         if key == "gene_name":
             gene_name = value
 
+
     dataframes = []
     transcripts = []
 
     if exon_of_interest != "blank":
         for key, value in resultsdict.iteritems():
             transcript = key
-            transcripts.append(transcript)
+            dataframes.append([transcript])
             headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
             newlist = []
             exons_before_list = []
@@ -326,12 +327,12 @@ def display_results(resultsdict):
                 newlist = EOI
             df = pandas.DataFrame(newlist, columns=headers)
             myfinisheddata = df.to_html(index=False)
-            dataframes.append(myfinisheddata)
+            dataframes[-1].append(myfinisheddata)
 
     else:
         for key, value in resultsdict.iteritems():
             transcript = key
-            transcripts.append(transcript)
+            dataframes.append([transcript])
             headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
             newlist = []
             for entry in value:
@@ -339,7 +340,7 @@ def display_results(resultsdict):
 
             df = pandas.DataFrame(newlist, columns=headers)
             myfinisheddata = df.to_html(index=False)
-            dataframes.append(myfinisheddata)
+            dataframes[-1].append(myfinisheddata)
 
 
 
