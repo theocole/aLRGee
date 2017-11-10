@@ -16,7 +16,6 @@ Command line tool to get LRG file,
 
 Usage:
 ------
-
 alrgee.py <gene_name> -e <exon_of_interest> [<exons_before>] [<exons_after>]
 """
 
@@ -37,22 +36,16 @@ def get_exon_shifts():
 
 def parse_args():
 
-    # creating flags for arguments
-    # parser = argparse.ArgumentParser()
-    # parser.add_arguments('-n', action='store',
-    #                      dest='exon_name', help='LRG gene name')
-    # parser.add_arguments(
-    #     '-e', action='store', dest='exon_number', help='Insert exon number of interest')
-    # parser.add_arguments('-b', action='store', dest='exon_before',
-    #                      help='Insert exon no. which comes before exon of interest')
-    # parser.add_arguments('-a', action='store', dest='exon_after',
-    #                      help='Insert exon no. which comes after exon of interest')
-
-    # results = parser.parse.args()
+    # The add_argumnets method is used to create flags for arguments; a help page with description of each flag 
+     #is created simultaneously. The help page can be accessed using --help.
+    # "action"- The action to be taken when the flag is encountered, in this instrance the flag shold be stored.
+    # "dest"- refers to the attribute associated to the flag
+    # "help"- provides a brief description of the function of the flag
+    # "required"- Detting it as TRUE, makes the flag a required command line option. 
 
     parser = argparse.ArgumentParser(description="Take gene name and exons of interest.")
     parser.add_argument(
-        '-n', action='store', dest='gene_name', help='HGNC gene name.'
+        '-n', action='store', dest='gene_name', required='TRUE', help='HGNC gene name.'
     )
     parser.add_argument(
         '-e', action='store', dest='exon_of_interest', help='Exon you would like to display a shift calculation for.'
@@ -69,14 +62,20 @@ def parse_args():
 
 
 def xml_scraper(gene):
-
+'''
+xml_scrapper function uses the urllib2 module to open the LRG sequence URL and puts the html 
+in lrg_list_html
+'''
     lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
     lrg_list_html = lrg_response.read()
 
+#BeautifulSoup library to pull data out of the html file and transfer it into lrg_soup. 
     lrg_soup = BeautifulSoup(lrg_list_html, 'html.parser')
 
+#lrg.soup.find searches for the tag "td" associated with the absolute gene name provided 
     gene_cell = lrg_soup.find("td", text=re.compile("^" + gene + "$"))
 
+#gene_
     gene_row = gene_cell.find_parent("tr")
 
     gene_xml_link = gene_row.find("a", text=re.compile("^LRG_\d+$"))
