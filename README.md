@@ -1,5 +1,4 @@
 # aLRGee 
-Program written to output differences between exon positions for genome builds within LRG files.
 
 Written by: Theo Cole, Rebecca Forrester and Natasha Pinto 
 ************
@@ -7,9 +6,9 @@ Synopis
 ************
 aLRGee is a command line tool developed to comapare LGR files with exon builds to investigate the differences between exon positions to aid in varaint investigation in a clinical setting.
 
-##############################################################################################
+############################################
 Running aLRGee from command line 
-##############################################################################################
+############################################
 
 To run the tool in command line: 
 
@@ -33,17 +32,17 @@ Example:
 	eg:
 		>> python aLRGEE -n NF1 -e 5 -b 1 -a 3
 
-##################################################################################################
+############################################
 REQUIREMENTS
-##################################################################################################
+############################################
 
 To run the tool you will need to have python 2.6 installed, as the some of the modules used require python 2.6 or over. 
 
 Refer to https://www.python.org/download/releases for instructions on how to update/dowload python 2.6 or over 
 
-###################################################################################################
+###############################
 aLRGee explained
-###################################################################################################
+###############################
 
 def main():
 
@@ -56,7 +55,7 @@ def main():
     results_dict = plot_exon_shifts(position_dict)
 
 
-
+##########################
 Function: def parse_args():
 ###########################
 
@@ -73,6 +72,7 @@ Function: def parse_args():
         '-n', action='store', dest='gene_name', required='TRUE', help='HGNC gene name.'
     )
 
+#################################
 Function: def xml_scraper(gene):
 #################################
 
@@ -99,11 +99,13 @@ If the associated xml file is found it will print:
 
 	>> "LRG file found at:", NF1_xml_href
 
+#######################################
 Function- def xml_parser(lrg_file_url):
 ######################################
 
  Susequently, once aLRGee obtains the required xml file the tool will use the library ElementTree to parse the LRG XML file and get the positions of the exons using LRG coordinate system, returning a dictionary of relative exon positions (and start/stop positions on each genome build.
 
+#####################################
 Functions- def display_results():
 ######################################
 
