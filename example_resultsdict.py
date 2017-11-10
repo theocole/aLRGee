@@ -195,7 +195,9 @@ if exon_of_interest != "blank":
         else:
             newlist = EOI
         df = pandas.DataFrame(newlist, columns=headers)
-        myfinisheddata = df.to_html(index=False)
+        #print df.headers
+        sorted_df = df.sort_values(by=['GrCh37_Start'], axis=0)
+        myfinisheddata = sorted_df.to_html(index=False)
         dataframes[-1].append(myfinisheddata)
 
 else:
@@ -228,5 +230,3 @@ file_out = open(current_date + ".html", "w")
 file_out.write(html_out.replace(
     " border=\"1\" class=\"dataframe\"", ""))
 file_out.close()
-
-print len(dataframes)

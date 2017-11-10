@@ -326,7 +326,8 @@ def display_results(resultsdict, args):
             else:
                 newlist = EOI
             df = pandas.DataFrame(newlist, columns=headers)
-            myfinisheddata = df.to_html(index=False)
+            sorted_df = df.sort_values(by=['GrCh37_Start'], axis=0)
+            myfinisheddata = sorted_df.to_html(index=False)
             dataframes[-1].append(myfinisheddata)
 
     else:
@@ -339,7 +340,8 @@ def display_results(resultsdict, args):
                 newlist.append(entry)
 
             df = pandas.DataFrame(newlist, columns=headers)
-            myfinisheddata = df.to_html(index=False)
+            sorted_df = df.sort_values(by=['GrCh37_Start'], axis=0)
+            myfinisheddata = sorted_df.to_html(index=False)
             dataframes[-1].append(myfinisheddata)
 
 
