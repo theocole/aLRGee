@@ -20,6 +20,7 @@ EOF= Exon of interest
 
 Required arguments: 
 -n -e
+
 Optional arguments:
 -b -a 
 
