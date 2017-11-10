@@ -357,7 +357,7 @@ def display_results(resultsdict, args):
     # write to a html file named of the current date
     file_out = open(current_date + ".html", "w")
     file_out.write(html_out.replace(
-        " border=\"1\" class=\"dataframe\"", ""))
+        " border=\"1\" class=\"dataframe\"", " class=\"table table-striped table-hover\""))
     file_out.close()
 
 
