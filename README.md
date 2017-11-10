@@ -1,16 +1,14 @@
 # aLRGee 
 
 Written by: Theo Cole, Rebecca Forrester and Natasha Pinto 
-************
-Synopis
-************
+
+## Synopsis 
+
 aLRGee is a command line tool developed to comapare LGR files with exon builds to investigate the differences between exon positions to aid in varaint investigation in a clinical setting.
 
-############################################
 
-Running aLRGee from command line 
 
-############################################
+## Running aLRGee from command line 
 
 To run the tool in command line: 
 
@@ -35,21 +33,14 @@ Example:
 	eg:
 		>> python aLRGEE -n NF1 -e 5 -b 1 -a 3
 
-############################################
 
-Requirements
-
-############################################
+## Requirements
 
 To run the tool you will need to have python 2.6 installed, as the some of the modules used require python 2.6 or over. 
 
 Refer to https://www.python.org/download/releases for instructions on how to update/dowload python 2.6 or over 
 
-###############################
-
-aLRGee explained
-
-###############################
+## aLRGee explained
 
 def main():
 
@@ -62,11 +53,7 @@ def main():
     results_dict = plot_exon_shifts(position_dict)
 
 
-##########################
-
-Function: def parse_args():
-
-###########################
+#Function: def parse_args():
 
  The add_argumnets method is used to create flags for arguments; a help page with description of each flag is created simultaneously. The help page can be accessed using --help.
    action- The action to be taken when the flag is encountered, in this instrance the flag shold be stored.
@@ -81,11 +68,8 @@ Function: def parse_args():
         '-n', action='store', dest='gene_name', required='TRUE', help='HGNC gene name.'
     )
 
-#################################
 
-Function: def xml_scraper(gene):
-
-#################################
+#Function: def xml_scraper(gene):
 
 xml_scrapper function uses urllib2 to open the LRG sequence URL and puts the html in a dictionary called lrg_list_html. 
 The BeautifulSoup library is used to pull data out of the html file and transfer it into another dictionary called lrg_soup. 
@@ -110,23 +94,15 @@ If the associated xml file is found it will print:
 
 	>> "LRG file found at:", NF1_xml_href
 
-#######################################
-
-Function- def xml_parser(lrg_file_url):
-
-######################################
+#Function- def xml_parser(lrg_file_url):
 
  Susequently, once aLRGee obtains the required xml file the tool will use the library ElementTree to parse the LRG XML file and get the positions of the exons using LRG coordinate system, returning a dictionary of relative exon positions (and start/stop positions on each genome build.
 
-#####################################
+#Functions- def display_results():
 
-Functions- def display_results():
+Takes dataframes of relative exon positions and absolute genome coords and displays on html template.
 
-######################################
-
- Takes dataframes of relative exon positions and absolute genome coords and displays on html template.
-
-Example of output for NF1 gene: 
+#Example of output for NF1 gene: 
 
 t2
 Exon number	GrCh37_Start	GrCh38_Start	GrCh37_stop	GrCh38_stop	Positional Shift

@@ -19,17 +19,20 @@
     </head>
     <body>
         <div class="container">
-            <h4>Exon shifts for gene:</h4>
-            <h1><span class="glyphicon glyphicon-transfer" aria_hidden="true"></span> {{title}}</h1>
+            <h1>aLRGee</h1>
+            <h5>automated LRG exon eschewer</h5>
+            <h2><span class="glyphicon glyphicon-transfer" aria_hidden="true"></span> {{title}}</h2>
             <hr>
             <body>
 
 {% for entry in data %}
   {% for line in entry %}
-    {{line}}
+    <h4>{{line}}</h4>
   {% endfor %}
 {% endfor%}
 </div>
+
+<p align="center">A project by Natasha Pinto, Rebecca Forrester, and Theo Cole.</p>
 </body>
 
 
