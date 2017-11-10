@@ -33,6 +33,8 @@ def main():
     pprint.pprint(position_dict)
     results_dict = plot_exon_shifts(position_dict)
 
+    display_results()
+
 
 def parse_args():
 
@@ -63,7 +65,7 @@ def parse_args():
 
 def xml_scraper(gene):
     '''
-    xml_scrapper function uses the urllib2 module to open the LRG sequence URL and puts the html 
+    xml_scrapper function uses the urllib2 module to open the LRG sequence URL and puts the html
     in lrg_list_html
     '''
     lrg_response = urllib2.urlopen("https://www.lrg-sequence.org/LRG")
@@ -170,7 +172,6 @@ def xml_parser(lrg_file_url):
                         # exon should be at least 1 codon long!
                         assert int(coords.attrib["end"]) - int(coords.attrib["start"]) >= 3
 
-
                         exon_position_dict["start"] = coords.attrib["start"]
                         exon_position_dict["end"] = coords.attrib["end"]
 
@@ -276,7 +277,6 @@ def display_results():
     on html template.
     """
 
-
     now = datetime.datetime.now()
 
     current_date = now.strftime("%d-%m-%Y")
@@ -296,9 +296,8 @@ def display_results():
     html_out = template.render(template_vars)
     # write to a html file named of the current date
     file_out = open(current_date + ".html", "w")
-    file_out.write(html_out)
     file_out.write(html_out.replace(
-        " border=\"1\" class=\"dataframe\"", ""))
+        " border=\"1\" class=\"dataframe\"", " class=\"table table-striped table-hover\""))
     file_out.close()
 
     pass
