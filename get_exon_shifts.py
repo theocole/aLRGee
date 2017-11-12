@@ -346,16 +346,16 @@ def display_results(resultsdict, args):
 
     now = datetime.datetime.now()
 
-    current_date = now.strftime("%d-%m-%Y")
+    current_date = now.strftime("%d-%m-%Y_%H-%M")
 
     env = Environment(loader=FileSystemLoader('.'))
     template = env.get_template("xml_report_template.html")
     # define what to pass to the template
-    template_vars = {"title": "Results for "+ gene_name, "transcripts": transcripts,"data": dataframes,}
+    template_vars = {"title": "Results for " + gene_name, "transcripts": transcripts,"data": dataframes,}
     # pass the template vars to the template
     html_out = template.render(template_vars)
     # write to a html file named of the current date
-    file_out = open(current_date + ".html", "w")
+    file_out = open("output/" + gene_name + "_" + current_date + ".html", "w")
     file_out.write(html_out.replace(
         " border=\"1\" class=\"dataframe\"", " class=\"table table-striped table-hover\""))
     file_out.close()
