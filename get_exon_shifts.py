@@ -29,8 +29,6 @@ def main():
     args = parse_args()
     lrg_file_url = xml_scraper(args['gene_name'])
     position_dict = xml_parser(lrg_file_url)
-
-    pprint.pprint(position_dict)
     results_dict = plot_exon_shifts(position_dict)
 
     display_results(results_dict, args)
