@@ -193,7 +193,18 @@ def xml_parser(lrg_file_url):
 
 
 def plot_exon_shifts(position_dict):
+    '''
+       Take the dictionary containing information on all exons. For each exon
+       plot the exon shift between builds using relative exon positions and
+       absolute genomic coordinates
+    '''
+
     def calc_genomic_position(exon_num, hg_18_start, hg_19_start, hg_18_stop, hg_19_stop, exon_start, exon_stop):
+        ''' calculates the exon positions relative to each genome build.
+            Positional shift is calculated by calculating the difference between
+            a pair of start coordinates. This calculation assumes there is no
+            size changes between the different builds.
+        '''
         hg18ex_start = (hg_18_start + exon_start)
         hg18ex_stop = (hg_18_stop + exon_stop)
         hg19ex_start = (hg_19_start + exon_start)
@@ -207,6 +218,7 @@ def plot_exon_shifts(position_dict):
     resultsdict = {}
 
     for key, value in position_dict.iteritems():
+        # separates the dictionary into the top 4 levels
         if key.startswith("build_GRCh38"):
             build_38 = value
         if key.startswith("build_GRCh37"):
@@ -214,15 +226,20 @@ def plot_exon_shifts(position_dict):
         if key.startswith("lrg_id"):
             LRG_id = value
         if key.startswith("t"):
+            """creates a list of lists with the transcript number as the first
+            item in the list and the dictionary related to this transcript as
+            the second entry"""
             transcripts.append([str(key), value])
 
     for key, value in build_38.iteritems():
+        # retrieves the start and stop gene coordinates for build 38
         if key.startswith("start"):
             build_19_start = int(value)
         if key.startswith("end"):
             build_19_stop = int(value)
 
     for key, value in build_37.iteritems():
+        # retriTakes df of relative exon positions and absolute genome coords eves the start and stop gene coordinates for build 37
         if key.startswith("start"):
             build_18_start = int(value)
         if key.startswith("end"):
@@ -231,10 +248,13 @@ def plot_exon_shifts(position_dict):
     for entry in transcripts:
         transcript_number = entry[0]
         exon_dict = entry[1]
+        # separates out the transcript dictionary
         for key, value in exon_dict.iteritems():
             exon_number = key
             exon_start_stop = value
-            transcripts_and_exons.append(["Transcript: " + transcript_number, exon_number, value])
+            transcripts_and_exons.append(["Transcript: "
+                                          + transcript_number, exon_number,
+                                          exon_start_stop])
 
     for entry in transcripts_and_exons:
         transcript = entry[0]
@@ -259,10 +279,19 @@ def plot_exon_shifts(position_dict):
             exon_num = detail[0]
             exon_start = int(detail[1])
             exon_stop = int(detail[2])
-            dataline = calc_genomic_position(exon_num, build_18_start, build_18_stop,
-                                             build_19_start, build_19_stop, exon_start, exon_stop)
+            """separated data from passed dictionary can now be sent for shift
+            calc"""
+            dataline = calc_genomic_position(exon_num, build_18_start,
+                                             build_18_stop, build_19_start,
+                                             build_19_stop, exon_start,
+                                             exon_stop)
+            """creates a new dictionary with each transcript as a new key
+            and the exon data lines as the entries """
+            # if transcript not in dict add as new entry (key)
             if transcript not in resultsdict:
                 resultsdict[transcript] = [dataline]
+                """if transcript is present in dict add the new dataline
+                to the pre-existing dictionary entry"""
             else:
                 resultsdict[transcript].append(dataline)
 
@@ -270,10 +299,12 @@ def plot_exon_shifts(position_dict):
 
 
 def display_results(resultsdict, args):
-    """
-    Takes df of relative exon positions and absolute genome coords and displays
-    on html template.
-    """
+    '''
+    Takes the dictionary containing exon shifts and creates a dataframe of the
+    datalines specified by user args. The dataframe is then passed to a HTML
+    template.
+    '''
+    # gives variable names to user arguements
     for key, value in args.iteritems():
         if key == "exon_of_interest":
             if value is not None:
@@ -297,15 +328,18 @@ def display_results(resultsdict, args):
     dataframes = []
     transcripts = []
 
+    # if an exon of interest has been specified
     if exon_of_interest != "blank":
         for key, value in resultsdict.iteritems():
             transcript = key
             dataframes.append([transcript])
-            headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
+            headers = ["Exon number", "GrCh37_Start", "GrCh38_Start",
+                       "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
             newlist = []
             exons_before_list = []
             exons_after_list = []
 
+            # adds exon of interest, exons before and exons after to a list
             for entry in value:
                 exon_number = int(entry[0].strip("exon"))
                 if exon_number == exon_of_interest:
@@ -323,35 +357,46 @@ def display_results(resultsdict, args):
                     newlist = exons_before_list+EOI
             else:
                 newlist = EOI
+            # create dataframe
             df = pandas.DataFrame(newlist, columns=headers)
+            # sort dataframe by start coordinates
             sorted_df = df.sort_values(by=['GrCh37_Start'], axis=0)
+            # convert dataframe to HTML
             myfinisheddata = sorted_df.to_html(index=False)
+            # add dataframe to end of list of dataframes
             dataframes[-1].append(myfinisheddata)
 
+    # if no exon of interest specified
     else:
         for key, value in resultsdict.iteritems():
             transcript = key
             dataframes.append([transcript])
-            headers = ["Exon number", "GrCh37_Start", "GrCh38_Start", "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
+            headers = ["Exon number", "GrCh37_Start", "GrCh38_Start",
+                       "GrCh37_stop", "GrCh38_stop", "Positional Shift"]
             newlist = []
             for entry in value:
+                # create list of all exons
                 newlist.append(entry)
-
+            # create dataframe
             df = pandas.DataFrame(newlist, columns=headers)
+            # sort dataframe by start coordinates
             sorted_df = df.sort_values(by=['GrCh37_Start'], axis=0)
+            # convert dataframe to HTML
             myfinisheddata = sorted_df.to_html(index=False)
+            # add dataframe to end of list of dataframes
             dataframes[-1].append(myfinisheddata)
-
-
 
     now = datetime.datetime.now()
 
+    # grabs current data
     current_date = now.strftime("%d-%m-%Y_%H-%M")
 
     env = Environment(loader=FileSystemLoader('.'))
+    # specifies html template
     template = env.get_template("xml_report_template.html")
     # define what to pass to the template
-    template_vars = {"title": "Results for " + gene_name, "transcripts": transcripts,"data": dataframes,}
+    template_vars = {"title": "Results for " + gene_name,
+                     "transcripts": transcripts, "data": dataframes}
     # pass the template vars to the template
     html_out = template.render(template_vars)
     # write to a html file named of the current date
