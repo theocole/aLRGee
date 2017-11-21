@@ -239,7 +239,7 @@ def plot_exon_shifts(position_dict):
             build_19_stop = int(value)
 
     for key, value in build_37.iteritems():
-        # Takes df of relative exon positions and absolute genome coords eves the start and stop gene coordinates for build 37
+        # retriTakes df of relative exon positions and absolute genome coords eves the start and stop gene coordinates for build 37
         if key.startswith("start"):
             build_18_start = int(value)
         if key.startswith("end"):
